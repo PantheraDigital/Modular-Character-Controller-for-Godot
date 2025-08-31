@@ -1,0 +1,93 @@
+[gd_scene load_steps=18 format=3 uid="uid://omib6sy0i28x"]
+
+[ext_resource type="Script" uid="uid://3eqo7411bjwq" path="res://controller_examples/scripts/simple_character/collision_shape_3d.gd" id="1_waaoc"]
+[ext_resource type="Script" uid="uid://812l427pcbu6" path="res://controller_examples/scripts/cameras/third_person_cam.gd" id="2_snlde"]
+[ext_resource type="Texture2D" uid="uid://gwt4mrbmdv01" path="res://controller_examples/assets/textures/Orange.png" id="2_w3elg"]
+[ext_resource type="Script" uid="uid://cavoehjg14dyj" path="res://character_controller/scripts/action_container.gd" id="3_418q7"]
+[ext_resource type="Script" uid="uid://dn0l3kkomlwu7" path="res://controller_examples/scripts/simple_character/actions/action_move_simple.gd" id="4_ftskt"]
+[ext_resource type="Script" uid="uid://0s27mb2d6unm" path="res://character_controller/scripts/action_container_config.gd" id="4_g44xp"]
+[ext_resource type="Script" uid="uid://cqdsr3d0jkd4b" path="res://controller_examples/scripts/simple_character/actions/action_jump_simple.gd" id="5_b0vjt"]
+[ext_resource type="Script" uid="uid://c6681ik7lvcr" path="res://controller_examples/scripts/simple_character/actions/action_toggle_movement_state.gd" id="7_ftskt"]
+[ext_resource type="Script" uid="uid://dm0g3witlgl8x" path="res://controller_examples/scripts/simple_character/actions/action_fly.gd" id="8_b0vjt"]
+[ext_resource type="Script" uid="uid://dhxeoug7ju6y3" path="res://character_controller/scripts/movement_state_manager.gd" id="9_b0vjt"]
+[ext_resource type="Script" uid="uid://to2l8lodveh7" path="res://controller_examples/scripts/simple_character/movement_grounded_complex.gd" id="11_s5huo"]
+[ext_resource type="Script" uid="uid://d06djvw0bjbol" path="res://controller_examples/scripts/simple_character/movement_flight_simple.gd" id="12_s5huo"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_2hqoy"]
+radius = 0.365
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_i8vfq"]
+radius = 0.365
+
+[sub_resource type="BoxMesh" id="BoxMesh_hno04"]
+size = Vector3(0.5, 0.5, 0.01)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_etj4c"]
+albedo_texture = ExtResource("2_w3elg")
+uv1_triplanar = true
+
+[sub_resource type="Resource" id="Resource_g44xp"]
+script = ExtResource("4_g44xp")
+config_dict = Dictionary[StringName, Array]({
+&"flight": [&"Fly", &"Dash", &"ToggleMovementState"],
+&"grounded": [&"Move", &"Jump", &"ToggleMovementState", &"Dash"]
+})
+metadata/_custom_type_script = "uid://0s27mb2d6unm"
+
+[node name="ExampleCharacter" type="CharacterBody3D" groups=["ControllableCharacter"]]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_2hqoy")
+script = ExtResource("1_waaoc")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CollisionShape3D"]
+mesh = SubResource("CapsuleMesh_i8vfq")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="CollisionShape3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.390276, -0.370053)
+mesh = SubResource("BoxMesh_hno04")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_etj4c")
+
+[node name="CamPivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.317, 0)
+script = ExtResource("2_snlde")
+
+[node name="SpringArm3D" type="SpringArm3D" parent="CamPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.317, 0)
+top_level = true
+spring_length = 2.0
+margin = 0.2
+
+[node name="Camera3D" type="Camera3D" parent="CamPivot/SpringArm3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+
+[node name="ActionContainer" type="Node" parent="."]
+script = ExtResource("3_418q7")
+_config_profiles = SubResource("Resource_g44xp")
+_starting_config = &"grounded"
+_disable_config_warnings = true
+
+[node name="Move" type="Node" parent="ActionContainer"]
+script = ExtResource("4_ftskt")
+
+[node name="Jump" type="Node" parent="ActionContainer"]
+script = ExtResource("5_b0vjt")
+
+[node name="ToggleMovementState" type="Node" parent="ActionContainer"]
+script = ExtResource("7_ftskt")
+
+[node name="Fly" type="Node" parent="ActionContainer"]
+script = ExtResource("8_b0vjt")
+
+[node name="MovementManager" type="Node" parent="." node_paths=PackedStringArray("active_state")]
+script = ExtResource("9_b0vjt")
+active_state = NodePath("GroundedMovement")
+
+[node name="GroundedMovement" type="Node" parent="MovementManager"]
+script = ExtResource("11_s5huo")
+
+[node name="FlyingMovement" type="Node" parent="MovementManager"]
+script = ExtResource("12_s5huo")

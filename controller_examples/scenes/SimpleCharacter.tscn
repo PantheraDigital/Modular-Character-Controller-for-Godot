@@ -1,0 +1,62 @@
+[gd_scene load_steps=12 format=3 uid="uid://cx6yw7mm2s808"]
+
+[ext_resource type="Script" uid="uid://3eqo7411bjwq" path="res://controller_examples/scripts/simple_character/collision_shape_3d.gd" id="1_hno04"]
+[ext_resource type="Script" uid="uid://db4vwuyfqss66" path="res://controller_examples/scripts/cameras/first_person_cam.gd" id="2_5njjn"]
+[ext_resource type="Texture2D" uid="uid://dkpqh8de7tb3n" path="res://controller_examples/assets/textures/Green.png" id="2_qgiec"]
+[ext_resource type="Script" uid="uid://cavoehjg14dyj" path="res://character_controller/scripts/action_container.gd" id="2_xir13"]
+[ext_resource type="Script" uid="uid://dn0l3kkomlwu7" path="res://controller_examples/scripts/simple_character/actions/action_move_simple.gd" id="3_hno04"]
+[ext_resource type="Script" uid="uid://cqdsr3d0jkd4b" path="res://controller_examples/scripts/simple_character/actions/action_jump_simple.gd" id="4_hk46a"]
+[ext_resource type="Script" uid="uid://dlnca6du3hovu" path="res://controller_examples/scripts/simple_character/movement_grounded_simple.gd" id="5_7v4qq"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_2hqoy"]
+radius = 0.365
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_i8vfq"]
+radius = 0.365
+
+[sub_resource type="BoxMesh" id="BoxMesh_hno04"]
+size = Vector3(0.5, 0.5, 0.01)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cgv7c"]
+albedo_texture = ExtResource("2_qgiec")
+uv1_triplanar = true
+
+[node name="SimpleCharacter" type="CharacterBody3D" groups=["ControllableCharacter"]]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_2hqoy")
+script = ExtResource("1_hno04")
+mesh_faces_camera_direction = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CollisionShape3D"]
+layers = 2
+mesh = SubResource("CapsuleMesh_i8vfq")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="CollisionShape3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.390276, -0.370053)
+layers = 2
+mesh = SubResource("BoxMesh_hno04")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_cgv7c")
+
+[node name="CamPivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.39128, 0)
+script = ExtResource("2_5njjn")
+
+[node name="Camera3D" type="Camera3D" parent="CamPivot"]
+cull_mask = 1048573
+
+[node name="ActionContainer" type="Node" parent="."]
+script = ExtResource("2_xir13")
+
+[node name="Move" type="Node" parent="ActionContainer"]
+script = ExtResource("3_hno04")
+
+[node name="Jump" type="Node" parent="ActionContainer"]
+script = ExtResource("4_hk46a")
+
+[node name="GroundedMovement" type="Node" parent="."]
+script = ExtResource("5_7v4qq")
+enabled = true

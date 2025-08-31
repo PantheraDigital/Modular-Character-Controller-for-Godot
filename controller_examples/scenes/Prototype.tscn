@@ -1,0 +1,209 @@
+[gd_scene load_steps=24 format=3 uid="uid://coue2qehpn4fr"]
+
+[ext_resource type="Script" uid="uid://b4c5qx68b6owi" path="res://controller_examples/scripts/level_script.gd" id="1_w83py"]
+[ext_resource type="Texture2D" uid="uid://doyodkg1ds7td" path="res://controller_examples/assets/textures/Sky.png" id="2_u3clc"]
+[ext_resource type="Script" uid="uid://brsvrykk3p5is" path="res://controller_examples/scripts/controllers/controller_ai.gd" id="3_hcb45"]
+[ext_resource type="Script" uid="uid://cxoo2wlaplh8v" path="res://controller_examples/scripts/controllers/controller_player.gd" id="4_2jtsw"]
+[ext_resource type="PackedScene" uid="uid://cx6yw7mm2s808" path="res://controller_examples/scenes/SimpleCharacter.tscn" id="5_ui4wt"]
+[ext_resource type="PackedScene" uid="uid://omib6sy0i28x" path="res://controller_examples/scenes/ExampleCharacter.tscn" id="6_8fbgn"]
+[ext_resource type="Texture2D" uid="uid://b8q44ipg8a3cq" path="res://controller_examples/assets/textures/Black.png" id="7_7wscq"]
+[ext_resource type="Texture2D" uid="uid://6wofk4ae5yf3" path="res://controller_examples/assets/textures/White.png" id="8_hcgt1"]
+[ext_resource type="Texture2D" uid="uid://dkpqh8de7tb3n" path="res://controller_examples/assets/textures/Green.png" id="9_25513"]
+[ext_resource type="PackedScene" uid="uid://cqe35jnafmlk" path="res://controller_examples/scenes/DashPickup.tscn" id="10_gddtd"]
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_6c4vd"]
+panorama = ExtResource("2_u3clc")
+
+[sub_resource type="Sky" id="Sky_5ngqa"]
+sky_material = SubResource("PanoramaSkyMaterial_6c4vd")
+
+[sub_resource type="Environment" id="Environment_ctwiv"]
+background_mode = 2
+sky = SubResource("Sky_5ngqa")
+tonemap_mode = 3
+glow_enabled = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ajchh"]
+albedo_texture = ExtResource("7_7wscq")
+uv1_triplanar = true
+texture_filter = 5
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_mmup0"]
+material = SubResource("StandardMaterial3D_ajchh")
+size = Vector2(50, 50)
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_26ptr"]
+data = PackedVector3Array(25, 0, 25, -25, 0, 25, 25, 0, -25, -25, 0, 25, -25, 0, -25, 25, 0, -25)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jkvud"]
+albedo_color = Color(0.156, 0.78, 0.6656, 1)
+albedo_texture = ExtResource("8_hcgt1")
+uv1_triplanar = true
+texture_filter = 5
+
+[sub_resource type="BoxMesh" id="BoxMesh_plpqy"]
+material = SubResource("StandardMaterial3D_jkvud")
+size = Vector3(10, 3, 1)
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_v7prx"]
+data = PackedVector3Array(-5, 1.5, 0.5, 5, 1.5, 0.5, -5, -1.5, 0.5, 5, 1.5, 0.5, 5, -1.5, 0.5, -5, -1.5, 0.5, 5, 1.5, -0.5, -5, 1.5, -0.5, 5, -1.5, -0.5, -5, 1.5, -0.5, -5, -1.5, -0.5, 5, -1.5, -0.5, 5, 1.5, 0.5, 5, 1.5, -0.5, 5, -1.5, 0.5, 5, 1.5, -0.5, 5, -1.5, -0.5, 5, -1.5, 0.5, -5, 1.5, -0.5, -5, 1.5, 0.5, -5, -1.5, -0.5, -5, 1.5, 0.5, -5, -1.5, 0.5, -5, -1.5, -0.5, 5, 1.5, 0.5, -5, 1.5, 0.5, 5, 1.5, -0.5, -5, 1.5, 0.5, -5, 1.5, -0.5, 5, 1.5, -0.5, -5, -1.5, 0.5, 5, -1.5, 0.5, -5, -1.5, -0.5, 5, -1.5, 0.5, 5, -1.5, -0.5, -5, -1.5, -0.5)
+
+[sub_resource type="PrismMesh" id="PrismMesh_0l7qq"]
+left_to_right = -2.0
+size = Vector3(5, 5, 5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pfpgv"]
+albedo_texture = ExtResource("9_25513")
+uv1_triplanar = true
+texture_filter = 5
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_rit6o"]
+data = PackedVector3Array(-12.5, 2.5, 2.5, 2.5, -2.5, 2.5, -2.5, -2.5, 2.5, -12.5, 2.5, -2.5, -2.5, -2.5, -2.5, 2.5, -2.5, -2.5, -12.5, 2.5, 2.5, -12.5, 2.5, -2.5, 2.5, -2.5, 2.5, -12.5, 2.5, -2.5, 2.5, -2.5, -2.5, 2.5, -2.5, 2.5, -12.5, 2.5, -2.5, -12.5, 2.5, 2.5, -2.5, -2.5, -2.5, -12.5, 2.5, 2.5, -2.5, -2.5, 2.5, -2.5, -2.5, -2.5, -2.5, -2.5, 2.5, 2.5, -2.5, 2.5, -2.5, -2.5, -2.5, 2.5, -2.5, 2.5, 2.5, -2.5, -2.5, -2.5, -2.5, -2.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1qj2g"]
+albedo_color = Color(0.95, 0.665, 0.66975, 1)
+
+[node name="Prototype" type="Node3D" node_paths=PackedStringArray("player_controller", "ai_controller", "player_character", "ai_character")]
+script = ExtResource("1_w83py")
+player_controller = NodePath("Controllers/PlayerController")
+ai_controller = NodePath("Controllers/AIController")
+player_character = NodePath("Characters/SimpleCharacter")
+ai_character = NodePath("Characters/ExampleCharacter")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_ctwiv")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866026, -0.433013, 0.249999, 0.5, -0.75, 0.433012, -1.3411e-07, 0.499999, 0.866026, 0, 0, 0)
+shadow_enabled = true
+directional_shadow_split_1 = 0.07
+directional_shadow_split_2 = 0.12
+directional_shadow_split_3 = 0.2
+directional_shadow_blend_splits = true
+
+[node name="Controllers" type="Node" parent="."]
+
+[node name="AIController" type="Node" parent="Controllers" node_paths=PackedStringArray("controlled_obj")]
+script = ExtResource("3_hcb45")
+controlled_obj = NodePath("../../Characters/ExampleCharacter")
+
+[node name="PlayerController" type="Node" parent="Controllers" node_paths=PackedStringArray("controlled_obj")]
+script = ExtResource("4_2jtsw")
+controlled_obj = NodePath("../../Characters/SimpleCharacter")
+
+[node name="Characters" type="Node" parent="."]
+
+[node name="SimpleCharacter" parent="Characters" instance=ExtResource("5_ui4wt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.185151, 0, 5.83012)
+
+[node name="ExampleCharacter" parent="Characters" instance=ExtResource("6_8fbgn")]
+
+[node name="Level" type="Node" parent="."]
+
+[node name="Floor" type="MeshInstance3D" parent="Level"]
+mesh = SubResource("PlaneMesh_mmup0")
+skeleton = NodePath("../..")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Level/Floor"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Floor/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_26ptr")
+
+[node name="Wall" type="MeshInstance3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -3)
+mesh = SubResource("BoxMesh_plpqy")
+skeleton = NodePath("../..")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Level/Wall"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Wall/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_v7prx")
+
+[node name="Slope" type="MeshInstance3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1, 4)
+mesh = SubResource("PrismMesh_0l7qq")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_pfpgv")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Level/Slope"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Slope/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_rit6o")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 1.15, 4)
+use_collision = true
+size = Vector3(1, 2.3, 3)
+
+[node name="CSGBox3D7" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0.5, 7)
+use_collision = true
+
+[node name="CSGBox3D8" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 1.8, 6)
+use_collision = true
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 0.642788, -0.766045, 0, 0.766045, 0.642788, -1.14192, 0.318018, 9.56882)
+use_collision = true
+size = Vector3(1, 2.3, 1)
+
+[node name="CSGBox3D6" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 0.819152, -0.573577, 0, 0.573577, 0.819152, -2.14192, 0.508237, 9.39007)
+use_collision = true
+size = Vector3(1, 2.3, 1)
+material = SubResource("StandardMaterial3D_1qj2g")
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 0.5, -0.866025, 0, 0.866025, 0.5, -0.141925, 0.0390427, 9.49878)
+use_collision = true
+size = Vector3(1, 2.3, 1)
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 0.258819, -0.965926, 0, 0.965926, 0.258819, 0.858075, -0.237046, 9.49878)
+use_collision = true
+size = Vector3(1, 2.3, 1)
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 0.173648, -0.984808, 0, 0.984808, 0.173648, 1.85808, -0.327185, 9.49878)
+use_collision = true
+size = Vector3(1, 2.3, 1)
+
+[node name="CSGCombiner3D" type="CSGCombiner3D" parent="Level"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.51662, -0.3, 7.01275)
+use_collision = true
+
+[node name="CSGBox3D" type="CSGBox3D" parent="Level/CSGCombiner3D"]
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="Level/CSGCombiner3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -0.2)
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="Level/CSGCombiner3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, -0.4)
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="Level/CSGCombiner3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, -0.6)
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="Level/CSGCombiner3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, -0.8)
+
+[node name="CSGCombiner3D2" type="CSGCombiner3D" parent="Level"]
+transform = Transform3D(-0.0121996, 0, 0.999926, 0, 1, 0, -0.999926, 0, -0.0121996, -5.21009, -0.3, 2.09944)
+use_collision = true
+
+[node name="CSGBox3D" type="CSGBox3D" parent="Level/CSGCombiner3D2"]
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="Level/CSGCombiner3D2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -0.2)
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="Level/CSGCombiner3D2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, -0.4)
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="Level/CSGCombiner3D2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, -0.6)
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="Level/CSGCombiner3D2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, -0.8)
+
+[node name="DashPickup" parent="." instance=ExtResource("10_gddtd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.78498, 0, -1.4562)
