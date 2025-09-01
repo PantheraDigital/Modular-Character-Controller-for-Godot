@@ -42,6 +42,8 @@ To create your own character
 - Add two more Nodes, but as children to ActionContainer and name them "Move" and "Jump"
 - Add the script "action_move_simple.gd" to Move and "action_jump_simple.gd" to Jump
 
+<img width="299" height="427" alt="Screenshot from 2025-09-01 00-40-30" src="https://github.com/user-attachments/assets/16f02f8e-0ac7-45d5-9211-12bcfc961fc4" />
+
 You will now have a character ready to be controlled that is capable of moving and jumping and has a first person camera. 
 
 - Now create a new scene that will be the level
@@ -50,11 +52,15 @@ You will now have a character ready to be controlled that is capable of moving a
 - Add a new Node to the level scene and call it PlayerController, then attach the "controller_player.gd" script
 - In the inspector for PlayerController, set the "Controlled Obj" variable to the character you created and added to the level
 
+<img width="298" height="467" alt="Screenshot from 2025-09-01 00-47-46" src="https://github.com/user-attachments/assets/bff30d1a-905e-445d-a408-4b20d664272d" />
+
 Finally the controls need to be set up in the Godot project.
 
 - Go to Project -> Project Setting -> Input Map
 - Add actions "move_left", "move_right", "move_forwards", "move_backwards", "jump", and "dash"
 - Bind the actions to any inputs you like
+
+<img width="1194" height="733" alt="Screenshot from 2025-09-01 00-49-33" src="https://github.com/user-attachments/assets/5d13765a-f582-492b-950e-8c05065642d8" />
 
 You should now have a level with a character that can be controlled by the player.
 
