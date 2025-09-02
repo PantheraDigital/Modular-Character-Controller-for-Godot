@@ -1,6 +1,6 @@
 # Modular-Character-Controller-for-Godot
 
-[Demo Video](https://youtu.be/ABDJnFag9q8)
+[Demo Video](https://youtu.be/ABDJnFag9q8) \
 [Support](https://pantheraonline.itch.io/godot-modular-character-controller)
 
 ## Example Level
