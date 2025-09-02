@@ -1,31 +1,15 @@
 # Modular-Character-Controller-for-Godot
 
 [Demo Video](https://youtu.be/ABDJnFag9q8) \
-[Support](https://pantheraonline.itch.io/godot-modular-character-controller)
-
-## Example Level
-
-This demo level is to show what can be done at a base level with this pack and to demonstrate the flexibility of decoupling input handling, action logic, and movement logic into their own nodes.
-
-### Controls
-
-- WASD - move
-- space - jump
-- alt - dash (if obtained)
-- tab - swap characters
-- double tap space when controlling the third person character - toggle between flying and walking
-
-In the level there are two characters. One is the Simple Character and the other the Example Character that are both included in the pack. The Simple (green) uses a first person camera and is the equivalent of using Godot's CharacterBody3D's Basic Movement template script. The Example Character (orange) uses a third person camera and starts off with a simple AI Controller script making it walk in circles. It uses a more complex movement script allowing it to step up and down ledges such as stairs, and it can switch between movement states to fly or walk.
-
-In the level is also a purple cube that will add a "Dash" action to any character that walks into it.
+[Play the Demo Level](https://pantheraonline.itch.io/godot-modular-character-controller)
 
 ## About
 
 This pack provides scripts that make it faster to develop well organize and reusable code for controllable characters. This is done by separating the code of a character out into actions that get attached to the character using Nodes, thus separating the logic into smaller more modular components that can be moved around and edited more easily.
 
-_The term "character" is used loosely here but is used to follow Godot's naming, specifically due to Godot's naming of Character Body 3D which is a "physics body specialized for characters moved by script". In the context of this pack a "character" is anything that may be controlled by a player or game AI. A character may be a person, car, bird, or magical floating sword.
+_The term "character" is used loosely here but is used to follow Godot's naming, specifically due to Godot's naming of Character Body 3D which is a "physics body specialized for characters moved by script". In the context of this pack a "character" is anything that may be controlled by a player or game AI. A character may be a person, car, bird, or magical floating sword._
 
-Also, the term "AI" is used in the way it is game development, that being a script on an NPC that might just be a bunch of 'if' statements._
+_Also, the term "AI" is used in the way it is game development, that being a script on an NPC that might just be a bunch of 'if' statements._
 
 ## Features
 - Action Nodes - separates out logic for characters into organized nodes
@@ -33,7 +17,14 @@ Also, the term "AI" is used in the way it is game development, that being a scri
 - Action Container Configurations - defined sets of actions that can be quickly swapped between at runtime on a character
 - Controller - the bridge between user and character separating input from character logic
 - Movement States - nodes responsible for processing the characters physics during different forms of movement (EX: grounded, flying, swimming)
-- Movement State Manager - a node for changing the active Movement State of a character  
+- Movement State Manager - a node for changing the active Movement State of a character
+
+## Includes
+- 2 example characters
+- 1 player controller
+- 1 npc controller
+- 2 movement state examples
+- some example actions for characters
 
 ## Getting Started
 
@@ -89,3 +80,16 @@ This node acts as the bridge between, well the controller of a character (person
 These components are used to separate out logic to prevent a monolithic character controller class but also to keep the character very flexible. With these scripts actions and even controllers can be swapped out at run time while also making it clear what a character can do during development. This decoupling of input handling and action logic make it very easy to add and edit what characters can do. 
 
 This pack also comes with a Movement State script and Movement State Manager script which handle the actual movement logic of a character. This is where one would implement how a car would drive and how a person would walk and add it to the characters. The manager script also makes it so that different Movement States can be swapped between during game play, such as walking to flying or walking to grapple hook swinging. 
+
+## Example Level
+
+In the level there are two characters. One is the Simple Character and the other the Example Character that are both included in the pack. The Simple (green) uses a first person camera and is the equivalent of using Godot's CharacterBody3D's Basic Movement template script. The Example Character (orange) uses a third person camera and starts off with a simple AI Controller script making it walk in circles. It uses a more complex movement script allowing it to step up and down ledges such as stairs, and it can switch between movement states to fly or walk.
+
+In the level is also a purple cube that will add a "Dash" action to any character that walks into it.
+
+### Controls
+- WASD - move
+- space - jump
+- alt - dash (if obtained)
+- tab - swap characters
+- double tap space when controlling the third person character - toggle between flying and walking
