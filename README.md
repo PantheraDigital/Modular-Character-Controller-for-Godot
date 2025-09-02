@@ -1,6 +1,7 @@
 # Modular-Character-Controller-for-Godot
 
 [Demo Video](https://youtu.be/ABDJnFag9q8)
+[Support](https://pantheraonline.itch.io/godot-modular-character-controller)
 
 ## Example Level
 
@@ -20,11 +21,19 @@ In the level is also a purple cube that will add a "Dash" action to any characte
 
 ## About
 
-This pack of scripts aims to make it easy to set up and develop any controllable character.
+This pack provides scripts that make it faster to develop well organize and reusable code for controllable characters. This is done by separating the code of a character out into actions that get attached to the character using Nodes, thus separating the logic into smaller more modular components that can be moved around and edited more easily.
 
-The term "character" is used loosely here but is used to follow Godot's naming, specifically due to Godot's naming of Character Body 3D which is a "physics body specialized for characters moved by script". In the context of this pack a "character" is anything that may be controlled by a player or game AI. A character may be a person, car, bird, or magical floating sword.
+_The term "character" is used loosely here but is used to follow Godot's naming, specifically due to Godot's naming of Character Body 3D which is a "physics body specialized for characters moved by script". In the context of this pack a "character" is anything that may be controlled by a player or game AI. A character may be a person, car, bird, or magical floating sword.
 
-Also, the term "AI" is used in the way it is game development, that being a script on an NPC that might just be a bunch of 'if' statements.
+Also, the term "AI" is used in the way it is game development, that being a script on an NPC that might just be a bunch of 'if' statements._
+
+## Features
+- Action Nodes - separates out logic for characters into organized nodes
+- Action Container - manages Action Nodes allowing them to be used dynamically as well as safely called by Controllers
+- Action Container Configurations - defined sets of actions that can be quickly swapped between at runtime on a character
+- Controller - the bridge between user and character separating input from character logic
+- Movement States - nodes responsible for processing the characters physics during different forms of movement (EX: grounded, flying, swimming)
+- Movement State Manager - a node for changing the active Movement State of a character  
 
 ## Getting Started
 
