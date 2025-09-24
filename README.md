@@ -80,6 +80,7 @@ You will now have a character ready to be controlled that is capable of moving a
 - In the inspector for PlayerController, set the "Controlled Obj" variable to the character you created and added to the level
 
 <img width="298" height="467" alt="Screenshot from 2025-09-01 00-47-46" src="https://github.com/user-attachments/assets/bff30d1a-905e-445d-a408-4b20d664272d" />
+<img width="312" height="390" alt="player-controller-inspector" src="https://github.com/user-attachments/assets/e7a5f752-6eee-4352-833d-1f5fd4cbe1e3" />
 
 Finally the controls need to be set up in the Godot project.
 
