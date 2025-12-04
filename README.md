@@ -2,7 +2,7 @@
 **Contact:** pantheradigitalonline@gmail.com
 
 [Demo Video](https://youtu.be/ABDJnFag9q8) \
-[Play the Demo Level](https://pantheraonline.itch.io/godot-modular-character-controller)
+[Play the Demo Level or Support on Itch.io](https://pantheraonline.itch.io/godot-modular-character-controller)
 
 ## About
 
