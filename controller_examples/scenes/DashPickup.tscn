@@ -1,0 +1,31 @@
+[gd_scene load_steps=6 format=3 uid="uid://cqe35jnafmlk"]
+
+[ext_resource type="Texture2D" uid="uid://b70qkbc614vpe" path="res://controller_examples/assets/textures/Purple.png" id="1_58vrm"]
+[ext_resource type="Script" uid="uid://dhuvbuvcunpgq" path="res://controller_examples/scripts/dash_pickup_trigger.gd" id="1_wlwq4"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_sjf01"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nhudn"]
+albedo_texture = ExtResource("1_58vrm")
+uv1_triplanar = true
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sjf01"]
+size = Vector3(1.6, 2, 1.6)
+
+[node name="DashPickup" type="Node3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.5, -0.146447, 0.853553, 0.5, 0.853553, -0.146447, -0.707107, 0.5, 0.5, 0, 1, 0)
+mesh = SubResource("BoxMesh_sjf01")
+surface_material_override/0 = SubResource("StandardMaterial3D_nhudn")
+
+[node name="Area3D" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+script = ExtResource("1_wlwq4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.96047e-08, 0, 5.96047e-08)
+shape = SubResource("BoxShape3D_sjf01")
+debug_fill = false
+
+[connection signal="body_entered" from="Area3D" to="Area3D" method="_on_body_entered"]

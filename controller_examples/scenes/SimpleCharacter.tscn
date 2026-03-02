@@ -1,0 +1,74 @@
+[gd_scene load_steps=13 format=3 uid="uid://cx6yw7mm2s808"]
+
+[ext_resource type="Texture2D" uid="uid://dkpqh8de7tb3n" path="res://controller_examples/assets/textures/Green.png" id="2_qgiec"]
+[ext_resource type="Script" uid="uid://cr8f75l4kpjtc" path="res://controller_examples/scripts/cam_control.gd" id="3_cgv7c"]
+[ext_resource type="Script" uid="uid://bs2fl152r842k" path="res://controller_examples/scripts/actions/simple_character/action_move.gd" id="4_cgv7c"]
+[ext_resource type="Script" uid="uid://cqdsr3d0jkd4b" path="res://controller_examples/scripts/actions/simple_character/action_jump.gd" id="4_hk46a"]
+[ext_resource type="Script" uid="uid://dh2kdimygr8on" path="res://modular_character_controller/core_scripts/action_manager.gd" id="4_qgiec"]
+[ext_resource type="Script" uid="uid://jdq73xatfguq" path="res://controller_examples/scripts/actions/simple_character/action_look.gd" id="6_qgiec"]
+[ext_resource type="PackedScene" uid="uid://d3x77kisvn7lk" path="res://modular_character_controller/debug/scenes/action_tree_debug_ui.tscn" id="7_cgv7c"]
+[ext_resource type="Script" uid="uid://i5i87vaep52c" path="res://controller_examples/scripts/movement_phys/movement_grounded.gd" id="7_qgiec"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_2hqoy"]
+radius = 0.365
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_i8vfq"]
+radius = 0.365
+
+[sub_resource type="BoxMesh" id="BoxMesh_hno04"]
+size = Vector3(0.5, 0.5, 0.01)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cgv7c"]
+albedo_texture = ExtResource("2_qgiec")
+uv1_triplanar = true
+
+[node name="SimpleCharacter" type="CharacterBody3D" groups=["ControllableCharacter"]]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_2hqoy")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CollisionShape3D"]
+layers = 2
+mesh = SubResource("CapsuleMesh_i8vfq")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="CollisionShape3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.390276, -0.370053)
+layers = 2
+mesh = SubResource("BoxMesh_hno04")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_cgv7c")
+
+[node name="CamPivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.39128, 0)
+script = ExtResource("3_cgv7c")
+sensitivity_x = 0.004
+sensitivity_y = 0.004
+
+[node name="Camera3D" type="Camera3D" parent="CamPivot"]
+cull_mask = 1048573
+
+[node name="ActionManager" type="Node" parent="." node_paths=PackedStringArray("_character")]
+script = ExtResource("4_qgiec")
+_character = NodePath("..")
+
+[node name="Move" type="Node" parent="ActionManager" node_paths=PackedStringArray("_movement_class", "_cam_control")]
+script = ExtResource("4_cgv7c")
+_movement_class = NodePath("../../GroundedMovement")
+_cam_control = NodePath("../../CamPivot")
+
+[node name="Jump" type="Node" parent="ActionManager" node_paths=PackedStringArray("_movement_class")]
+script = ExtResource("4_hk46a")
+_movement_class = NodePath("../../GroundedMovement")
+
+[node name="Look" type="Node" parent="ActionManager" node_paths=PackedStringArray("face_cam_forward", "_cam_control")]
+script = ExtResource("6_qgiec")
+face_cam_forward = [NodePath("../../CollisionShape3D")]
+_cam_control = NodePath("../../CamPivot")
+
+[node name="ActionTreeDebugUi" parent="ActionManager" instance=ExtResource("7_cgv7c")]
+
+[node name="GroundedMovement" type="Node" parent="."]
+script = ExtResource("7_qgiec")
+enabled = true
