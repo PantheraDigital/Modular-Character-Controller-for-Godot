@@ -1,6 +1,12 @@
 # Modular-Character-Controller-for-Godot
 **Contact:** pantheradigitalonline@gmail.com
 
+## Warning
+DO NOT update existing projects with the old version to this version. \
+I have recently updated this project to its 2.0 version which includes big changes. \
+I will update this documentation soon but for now I have included documentation in the files themselves. \
+I will also be leaving this old documentation up for the time being as the general aspects of it still apply, but I recommend looking at the example characters and the documentation in the editor.
+
 [Demo Video](https://youtu.be/ABDJnFag9q8) \
 [Play the Demo Level or Support on Itch.io](https://pantheraonline.itch.io/godot-modular-character-controller)
 
