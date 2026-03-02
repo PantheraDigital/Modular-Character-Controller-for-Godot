@@ -1,5 +1,7 @@
 extends Node3D
 
+## Swaps Player controller with AI controller
+
 @export var player_controller: Controller
 @export var ai_controller: Controller
 
@@ -19,12 +21,16 @@ func _process(_delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_TAB:
+		if event.keycode == KEY_TAB and player_character and ai_character:
 			if swapped:
-				player_controller.controlled_obj = player_character
-				ai_controller.controlled_obj = ai_character
+				if player_controller:
+					player_controller.controlled_obj = player_character
+				if ai_controller:
+					ai_controller.controlled_obj = ai_character
 				swapped = false
 			else:
-				player_controller.controlled_obj = ai_character
-				ai_controller.controlled_obj = player_character
+				if player_controller:
+					player_controller.controlled_obj = ai_character
+				if ai_controller:
+					ai_controller.controlled_obj = player_character
 				swapped = true

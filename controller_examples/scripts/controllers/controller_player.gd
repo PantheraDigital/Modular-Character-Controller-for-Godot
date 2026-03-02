@@ -1,98 +1,92 @@
 extends Controller
 
-## provides input to ActionContainer
-## example of player controller
+## Provides input from player to [ActionManager] on a character. \
+## Example of player controller.
+
+# Expected input list:
+# move_left, move_right, move_forwards, move_backwards
+# fly_up, fly_down
+# run, jump, dash
+
 
 const DOUBLE_TAP_DELAY: float = 0.25
 
-var _cam_pivot: Node3D
-var _action_container: ActionContainer
+
+var _action_manager: ActionManager
 
 var _last_input_window: float = 0.0
 var _last_input: StringName
-var _input_tracking: Dictionary[StringName, Variant] = \
-{
-	"move":Vector3.ZERO,
-	"run":false, 
-	"jump":false, 
-	"slide":false,
-}
+
+var _double_tap_running: bool
 
 
 func _on_controlled_obj_change():
-	if _action_container and _action_container.action_exit.is_connected(_on_action_exit):
-		_action_container.action_exit.disconnect(_on_action_exit)
-	
-	_cam_pivot = controlled_obj.get_node("CamPivot")
-	if _cam_pivot.camera:
-		_cam_pivot.camera.make_current()
-	
-	_action_container = controlled_obj.get_node("ActionContainer")
-	_action_container.action_exit.connect(_on_action_exit) # needed to prevent missed inputs
-		# warning: can cause inf loop
-		# evaluate_all_input -> stop_action -> action_exit -> evaluate_all_input
-		# actions must not enter and exit in the same frame
+	_action_manager = controlled_obj.get_node("ActionManager")
+	var _cam_control: Node3D = controlled_obj.get_node("CamPivot")
+	if _cam_control.camera:
+		_cam_control.camera.make_current()
 
 
 func _process(delta: float) -> void:
 	if _last_input_window > 0.0:
 		_last_input_window -= delta
 		if _last_input_window <= 0.0:
-			_last_input = ""
+			_last_input = &""
 	
 	if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 		return
 	
-	var input: Vector2 = Input.get_vector("move_left", "move_right", "move_forwards", "move_backwards").rotated(-_cam_pivot.rotation.y)
-	_input_tracking["move"] = Vector3(input.x, 0.0, input.y)
-	evaluate_input("move")
+	var input: Vector2 = Input.get_vector(&"move_left", &"move_right", &"move_forwards", &"move_backwards")
+	if input:
+		_action_manager.play_action( &"MOVE", {&"input_direction":Vector3(input.x, 0.0, input.y)} )
+	
+	if Input.is_action_pressed(&"fly_up"):
+		_action_manager.play_action(&"MOVE", {&"input_direction":Vector3.UP, &"alt_move":true})
+	
+	if Input.is_action_pressed(&"fly_down"):
+		_action_manager.play_action(&"MOVE", {&"input_direction":Vector3.DOWN, &"alt_move":true})
+
 
 func _unhandled_input(event: InputEvent) -> void:
 	if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 		return
 	
 	if event is InputEventMouseMotion:
-		_cam_pivot.rotate_view(event.relative)
+		_action_manager.play_action(&"LOOK", {&"rotation":event.relative})
+		return
 	
-	for check in ["run", "jump", "dash"]:
-		if event.is_action(check):
-			var is_double: bool = false
-			_input_tracking[check] = event.is_action_pressed(check)
-			if event.is_action_pressed(check):
-				if _last_input == "":
-					_last_input = check
-					_last_input_window = DOUBLE_TAP_DELAY
-				elif _last_input == check:
-					is_double = true
-					_last_input = ""
-					_last_input_window = 0.0
-			evaluate_input(check, is_double)
+	if event.is_action(&"run"):
+		if event.is_action_pressed(&"run"):
+			_action_manager.play_action(&"RUN")
+		else:
+			_action_manager.stop_action(&"RUN")
+	
+	if event.is_action(&"jump"):
+		if event.is_action_pressed(&"jump"):
+			_action_manager.play_action(&"JUMP")
+	
+	if event.is_action(&"dash"):
+		if event.is_action_pressed(&"dash"):
+			_action_manager.play_action(&"DASH")
+	
+	if event.is_action(&"move_forwards"):
+		if event.is_action_pressed(&"move_forwards") and double_tap_check(&"move_forwards"):
+			_action_manager.play_action(&"RUN")
+			_double_tap_running = true
+		if event.is_action_released(&"move_forwards") and _double_tap_running:
+			_action_manager.stop_action(&"RUN")
+			_double_tap_running = false
+	
 
 
-func evaluate_input(key: String, double_tap: bool = false) -> void:
-	match key:
-		"move":
-			_action_container.play_action("MOVE", {"input_direction":_input_tracking["move"], "aim_direction":_cam_pivot.get_cam_forward()})
-		"run":
-			if _input_tracking[key]:
-				_action_container.play_action("RUN")
-			else:
-				_action_container.stop_action("RUN")
-		"jump":
-			if _input_tracking[key]:
-				var should_jump: bool = true
-				if double_tap:
-					should_jump = not _action_container.play_action("TOGGLE_MOVE_STATE")
-				if should_jump:
-					_action_container.play_action("JUMP")
-		"dash":
-			if _input_tracking[key]:
-				_action_container.play_action("DASH")
-
-func evaluate_all_input() -> void:
-	for action in _input_tracking.keys():
-		evaluate_input(action)
-
-
-func _on_action_exit(_action_id: StringName) -> void:
-	evaluate_all_input()
+## If input was pressed twice quickly
+func double_tap_check(input: StringName) -> bool:
+	var result := false
+	if _last_input == &"":
+		_last_input = input
+		_last_input_window = DOUBLE_TAP_DELAY
+	elif _last_input == input:
+		result = true
+		_last_input = &""
+		_last_input_window = 0.0
+	return result
