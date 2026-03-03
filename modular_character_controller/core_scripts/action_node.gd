@@ -6,14 +6,14 @@ class_name ActionNode
 # call order:
 # can_play() -> _can_play()
 # play() -> __enter() -> enter_action -> _enter() -> play_action -> _play()
-# interrupt() -> interrupt_action -> _interrupt() -> __exit() -> exit_action -> _exit()
+# stop() -> stop_action -> _stop() -> __exit() -> exit_action -> _exit()
 
 ## Emitted when [method ActionNode.play] is called. Emitted once if [method ActionNode.play] is called multiple times before the action exits.
 signal enter_action(action: ActionNode)
 ## Emitted when [method ActionNode.play] is called. Emitted every time [method ActionNode.play] is called if actin can play.
 signal play_action(action: ActionNode)
-## Emitted when [method ActionNode.interrupt] is called. This represents an action exiting before it naturally exited.
-signal interrupt_action(action: ActionNode)
+## Emitted when [method ActionNode.stop] is called. This represents an action exiting before it naturally exited.
+signal stop_action(action: ActionNode)
 ## Emitted when action ends.
 signal exit_action(action: ActionNode)
 
@@ -66,12 +66,12 @@ func play(_params: Dictionary = {}) -> bool:
 	return true
 
 ## Force exit action if playing. [br]
-## Emits [signal interrupt_action], then [signal exit_action].
-func interrupt() -> bool:
+## Emits [signal stop_action], then [signal exit_action].
+func stop() -> bool:
 	if !is_playing: 
 		return false
-	interrupt_action.emit(self)
-	_interrupt()
+	stop_action.emit(self)
+	_stop()
 	__exit()
 	return true
 
@@ -95,8 +95,8 @@ func _play(_params: Dictionary = {}) -> void:
 	pass
 
 ## Override to handle an early exit of this action. [br]
-## Called after [signal interrupt_action] and before [method __exit]
-func _interrupt() -> void:
+## Called after [signal stop_action] and before [method __exit]
+func _stop() -> void:
 	pass
 
 ## Override to run code every time this action finishes. [br]

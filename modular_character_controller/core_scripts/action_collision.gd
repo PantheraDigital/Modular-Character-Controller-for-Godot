@@ -34,7 +34,7 @@ func _init(owning_action: ActionNode) -> void:
 ## # in collision for DASH action
 ## func _hit_by(_other_collision: ActionCollision) -> void:
 ##     if _other_collision.action_node.TYPE == &"JUMP"
-##         action_node.interrupt()
+##         action_node.stop()
 ## [/codeblock]
 func _hit_by(_other_collision: ActionCollision) -> void:
 	pass

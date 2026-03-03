@@ -77,7 +77,7 @@ func stop_action(action_type: StringName) -> bool:
 	if index == -1: return false
 	
 	if _playing_actions[index].is_playing:
-		_playing_actions[index].interrupt()
+		_playing_actions[index].stop()
 		return true
 	return false
 #endregion
