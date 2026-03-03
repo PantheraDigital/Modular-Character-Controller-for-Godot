@@ -24,7 +24,7 @@ func _enter() -> void:
 func _play(_params: Dictionary = {}) -> void:
 	pass
 
-func _interrupt() -> void:
+func _stop() -> void:
 	pass
 
 func _exit() -> void:
