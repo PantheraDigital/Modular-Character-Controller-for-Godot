@@ -9,8 +9,6 @@ const COOLDOWN: float = 0.5
 const PLAYTIME: float = 0.25
 const SPEED: float = 10.0
 
-var _character: CharacterBody3D
-
 @export var _movement_class: MovementState 
 @export var _collision_shape_3d: CollisionShape3D
 
