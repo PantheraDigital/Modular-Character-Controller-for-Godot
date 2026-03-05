@@ -7,7 +7,7 @@ Leave a **review**, **play** the demo level in browser, read **devlogs**, or _do
 
 <br/><br/>
 **_Update Notes_** \
-Latest version of this system not compatible with older version. Major restructuring and name changes.
+Latest version of this system not compatible with older version. Major restructuring and name changes. \
 Tested on Godot versions 4.4, 4.5, 4.6.1
 <br/><br/>
 
