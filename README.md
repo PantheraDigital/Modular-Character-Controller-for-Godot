@@ -1,7 +1,7 @@
 # Modular-Character-Controller-for-Godot
 **Contact:** pantheradigitalonline@gmail.com 
 
-Leave a **review**, **play** the demo level in browser, read **devlogs**, or _donate_: [Itch.io](https://pantheraonline.itch.io/godot-modular-character-controller) 
+Leave a **review**, **play** the demo level in browser, read **devlogs**, or _donate_: [Itch.io](https://pantheradigital.itch.io/godot-modular-character-controller) 
 
 [Demo Video](https://youtu.be/ABDJnFag9q8) 
 
