@@ -119,6 +119,7 @@ func _get_by_type(action_type: StringName) -> int:
 	var action: ActionNode = ActionNode.new()
 	action.TYPE = action_type
 	var index: int = _actions.bsearch_custom(action, _sort_action)
+	action.free()
 	if index >= _actions.size() or _actions[index].TYPE != action_type:
 		index = -1
 	while index > 0 and _actions[index - 1].TYPE == action_type:
