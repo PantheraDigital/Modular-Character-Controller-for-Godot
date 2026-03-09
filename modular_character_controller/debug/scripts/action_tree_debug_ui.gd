@@ -9,6 +9,7 @@ const PLAYING_COLOR_TXT: Color = Color(1,1,1,1)
 
 const ACTIVE_COLOR_BG: Color = Color(0,0,0,0.4)
 const ACTIVE_COLOR_TXT: Color = Color(1,1,1,1)
+const ACTIVE_COLOR_TXT_PROFILE: Color = Color(0.2,1,1,1)
 
 const INACTIVE_COLOR_BG: Color = Color(0,0,0,0.15)
 const INACTIVE_COLOR_TXT: Color = Color(1,1,1,0.6)
@@ -76,14 +77,27 @@ func _update_ui() -> void:
 	# add profile label
 	if action_manager._action_permissions and action_manager._action_permissions.is_valid():
 		_clear_chidren(profile_ui_container)
-		var profile_ui: Label = _create_label(action_manager._active_permission_profile, Color(0.2,1,1,1), ACTIVE_COLOR_BG)
-		profile_ui_container.add_child(profile_ui)
-		profile_ui.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		
+		var prof_name: StringName = "prof-" + action_manager._active_permission_profile
+		# active profile
+		if !label_dict.has(prof_name):
+			var profile_ui: Label = _create_label(prof_name, ACTIVE_COLOR_TXT_PROFILE, ACTIVE_COLOR_BG)
+			label_dict[prof_name] = {"label":profile_ui, "timestamp":-1}
+			label_dict[prof_name]["label"].size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		profile_ui_container.add_child(label_dict[prof_name]["label"])
+		_set_profile_active(prof_name)
+		
+		# inactive profiles
 		for permission_profile: StringName in action_manager._action_permissions._profiles.keys():
-			if permission_profile != action_manager._active_permission_profile:
-				profile_ui = _create_label(permission_profile, INACTIVE_COLOR_TXT, INACTIVE_COLOR_BG)
-				profile_ui.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-				profile_ui_container.add_child(profile_ui)
+			if permission_profile == action_manager._active_permission_profile:
+				continue
+			prof_name = "prof-" + permission_profile
+			if !label_dict.has(prof_name):
+				var profile_ui: Label = _create_label(prof_name, INACTIVE_COLOR_TXT, INACTIVE_COLOR_BG)
+				label_dict[prof_name] = {"label":profile_ui, "timestamp":-1}
+				label_dict[prof_name]["label"].size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			profile_ui_container.add_child(label_dict[prof_name]["label"])
+			_set_profile_inactive(prof_name)
 	
 	# fill tree with actions
 	for action: ActionNode in all_actions:
@@ -138,6 +152,20 @@ func _set_label_prohibited(action: ActionNode) -> void:
 	label_dict[action.name]["label"].label_settings.font_color = INACTIVE_COLOR_TXT
 	var color_rect: ColorRect = label_dict[action.name]["label"].get_children()[0]
 	color_rect.color = INACTIVE_COLOR_BG
+
+func _set_profile_inactive(profile_name: StringName) -> void:
+	if !label_dict.has(profile_name):
+		return
+	label_dict[profile_name]["label"].label_settings.font_color = INACTIVE_COLOR_TXT
+	var color_rect: ColorRect = label_dict[profile_name]["label"].get_children()[0]
+	color_rect.color = INACTIVE_COLOR_BG
+
+func _set_profile_active(profile_name: StringName) -> void:
+	if !label_dict.has(profile_name):
+		return
+	label_dict[profile_name]["label"].label_settings.font_color = ACTIVE_COLOR_TXT_PROFILE
+	var color_rect: ColorRect = label_dict[profile_name]["label"].get_children()[0]
+	color_rect.color = ACTIVE_COLOR_BG
 
 
 func _clear_chidren(node: Node) -> void:
