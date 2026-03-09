@@ -137,7 +137,8 @@ func _set_label_not_playing(action: ActionNode) -> void:
 	# delay label change if action play and stop happen too quickly
 	# label would always appear off otherwise for actions that start and stop in the same frame
 	var set_not_playing: Callable = func():
-		if label_dict[action.name]["timestamp"] == -1:
+		if label_dict[action.name]["timestamp"] == -1 or \
+			label_dict[action.name]["label"].label_settings.font_color == INACTIVE_COLOR_TXT:
 			return
 		label_dict[action.name]["timestamp"] = -1
 		label_dict[action.name]["timer"] = null
