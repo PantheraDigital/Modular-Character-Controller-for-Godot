@@ -82,7 +82,7 @@ func _update_ui() -> void:
 		# active profile
 		if !label_dict.has(prof_name):
 			var profile_ui: Label = _create_label(prof_name, ACTIVE_COLOR_TXT_PROFILE, ACTIVE_COLOR_BG)
-			label_dict[prof_name] = {"label":profile_ui, "timestamp":-1}
+			label_dict[prof_name] = {"label":profile_ui}
 			label_dict[prof_name]["label"].size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		profile_ui_container.add_child(label_dict[prof_name]["label"])
 		_set_profile_active(prof_name)
@@ -111,7 +111,7 @@ func _update_ui() -> void:
 			var action_ui: Label = _create_label(action.name, (ACTIVE_COLOR_TXT if permitted else INACTIVE_COLOR_TXT), (ACTIVE_COLOR_BG if permitted else INACTIVE_COLOR_BG))
 			action.play_action.connect(_set_label_playing)
 			action.exit_action.connect(_set_label_not_playing)
-			label_dict[action.name] = {"label":action_ui, "timestamp":-1}
+			label_dict[action.name] = {"label":action_ui, "timestamp":-1, "timer":null}
 		
 		if permitted:
 			action_ui_container.add_child(label_dict[action.name]["label"])
@@ -136,12 +136,17 @@ func _set_label_playing(action: ActionNode) -> void:
 func _set_label_not_playing(action: ActionNode) -> void:
 	# delay label change if action play and stop happen too quickly
 	# label would always appear off otherwise for actions that start and stop in the same frame
-	while Time.get_ticks_msec() - label_dict[action.name]["timestamp"] < 50:
-		await get_tree().process_frame
-	if label_dict[action.name]["label"].label_settings.font_color == INACTIVE_COLOR_TXT:
-		return
-	label_dict[action.name]["timestamp"] = -1
-	_set_label_permitted(action)
+	var set_not_playing: Callable = func():
+		if label_dict[action.name]["timestamp"] == -1:
+			return
+		label_dict[action.name]["timestamp"] = -1
+		label_dict[action.name]["timer"] = null
+		_set_label_permitted(action)
+	
+	if Time.get_ticks_msec() - label_dict[action.name]["timestamp"] < 50:
+		_set_label_timeout(action.name, set_not_playing) # set repeating timer till "timestamp" is 50msec away from current time
+	else:
+		set_not_playing.call()
 
 func _set_label_permitted(action: ActionNode) -> void:
 	label_dict[action.name]["label"].label_settings.font_color = ACTIVE_COLOR_TXT
@@ -166,6 +171,23 @@ func _set_profile_active(profile_name: StringName) -> void:
 	label_dict[profile_name]["label"].label_settings.font_color = ACTIVE_COLOR_TXT_PROFILE
 	var color_rect: ColorRect = label_dict[profile_name]["label"].get_children()[0]
 	color_rect.color = ACTIVE_COLOR_BG
+
+# uses a [SceneTreeTimer] to check every interval if callable can be called based on label timestamp
+# if timer is up but Time is still too close to timestamp, the timer will be remade
+func _set_label_timeout(label_name: StringName, callable: Callable) -> void:
+	if label_dict[label_name]["timer"]:
+		return
+	
+	var delay_msec: int = 50 # msec == 1000 sec
+	var buffer_play: Callable = func():
+		if Time.get_ticks_msec() - label_dict[label_name]["timestamp"] < delay_msec:
+			label_dict[label_name]["timer"] = null
+			_set_label_timeout(label_name, callable)
+		else:
+			callable.call()
+	
+	label_dict[label_name]["timer"] = get_tree().create_timer(delay_msec * 0.001) # msec to sec
+	label_dict[label_name]["timer"].timeout.connect(buffer_play)
 
 
 func _clear_chidren(node: Node) -> void:
