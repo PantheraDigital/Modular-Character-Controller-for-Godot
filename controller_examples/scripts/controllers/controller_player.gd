@@ -12,8 +12,6 @@ extends Controller
 const DOUBLE_TAP_DELAY: float = 0.25
 
 
-var _action_manager: ActionManager
-
 var _last_input_window: float = 0.0
 var _last_input: StringName
 
@@ -21,7 +19,6 @@ var _double_tap_running: bool
 
 
 func _on_controlled_obj_change():
-	_action_manager = controlled_obj.get_node("ActionManager")
 	var _cam_control: Node3D = controlled_obj.get_node("CamPivot")
 	if _cam_control.camera:
 		_cam_control.camera.make_current()
