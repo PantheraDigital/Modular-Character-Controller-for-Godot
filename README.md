@@ -1,9 +1,9 @@
 # Modular-Character-Controller-for-Godot
-**Contact:** pantheradigitalonline@gmail.com 
-
-Leave a **review**, **play** the demo level in browser, read **devlogs**, or _donate_: [Itch.io](https://pantheradigital.itch.io/godot-modular-character-controller) 
-
-[Demo Video](https://youtu.be/ABDJnFag9q8) 
+**Contact:** pantheradigitalonline@gmail.com \
+**Links:**
+- [Itch.io](https://pantheradigital.itch.io/godot-modular-character-controller): Leave a **review**, **play** the demo, read **devlogs**, or _donate_
+- [Demo Video](https://youtu.be/ABDJnFag9q8)
+- [2D Demo Project](https://github.com/PantheraDigital/Modular-Kinematic-Character-2D/tree/main)
 
 <br/><br/>
 **_Update Notes_** \
