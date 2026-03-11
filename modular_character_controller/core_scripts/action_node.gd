@@ -27,7 +27,7 @@ signal exit_action(action: ActionNode)
 
 # optional variables. uncomment to include
 # these are set when ActionManager _on_child_enter() or _on_child_exit() signals fire
-#var _character: CharacterBody3D # good for getting other nodes or getting data of character such as velocity
+#var _character: CharacterBody3D or CharacterBody2D # good for getting other nodes or getting data of character such as velocity
 #var _manager: ActionManager # reconfiguring available actions or playing/stopping another action
 #var _container: ActionContainer # edits action nodes on character
 

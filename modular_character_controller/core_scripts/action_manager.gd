@@ -18,8 +18,8 @@ signal managed_actions_change(active_profile: StringName, permitted_actions: Arr
 ## Used internally by [method _get_action] to determine what kind of actions to get.
 enum GetFilterType {USE_PERMISSIONS, IGNORE_PERMISSIONS, PRIVATE_ACTIONS}
 
-## The character that this manager manages actions for.
-@export var _character: CharacterBody3D
+## The character that this manager manages actions for. Should be of type [CharacterBody3D] or [CharacterBody2D].
+@export var _character: Node
 ## The profile this manager uses to filter actions before playing them. [br]
 ## This is optional if the character is not expected to restrict which actions can be played. [br]
 ## See [PermissionContainer] for more.
