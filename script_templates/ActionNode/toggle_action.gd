@@ -6,7 +6,7 @@ extends ActionNode
 
 # optional variables. uncomment to include
 # set by ActionManager when ActionManager enters tree or when ActionNode is added to ActionManager
-#var _character: CharacterBody3D
+#var _character: CharacterBody3D or CharacterBody2D
 #var _manager: ActionManager
 #var _container: ActionContainer
 
