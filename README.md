@@ -92,8 +92,8 @@ What an Action Node does will depend on your project.
 *Behavior*
 When designing your actions keep in mind they will only ever be told to play or stop. From this there are two main behaviors that can be used, one shot and toggle.
 
-[One Shot](): Plays then ends on its own. This type of action can be fired and forgotten as it is more self managing. 
-[Toggle](): Plays till it is told to stop. This action is good for actions that should be active till a request explicitly tells it to stop. 
+[One Shot](addons/script_templates/ActionNode/one_shot_action.gd): Plays then ends on its own. This type of action can be fired and forgotten as it is more self managing. 
+[Toggle](addons/script_templates/ActionNode/toggle_action.gd): Plays till it is told to stop. This action is good for actions that should be active till a request explicitly tells it to stop. 
 
 When choosing a behavior keep in mind that how an action behaves is separate from player input. Planing action behavior before the player input can make input remapping easier.
 
@@ -105,16 +105,15 @@ Action Nodes are given a type which is what they are requested by.
 Using a jump action as an example, it will have a type of "jump". When the player presses the correct button the Controller will request "jump". The Action Manager will then find and play the Action Node with the matching "jump" type.
 **controller calling jump action img**
 
-This is used instead of class names or node paths so that multiple actions can share types. Having Action Nodes share types allows you to have more focused implementations of actions. For example you may have two actions that share the "move" type, one fore moving on land and one for moving in water. See [permission container]() for details on limiting which actions can play for handling shared types.
-You can also "override" actions by using shared types. Having two actions share the "jump" type where one action handles basic jumps, then a second action for powered up jumps. The second can be added to the player via power up giving them different jumps. See [action collision](), priority index, for details on action overriding. 
+This is used instead of class names or node paths so that multiple actions can share types. Having Action Nodes share types allows you to have more focused implementations of actions. For example you may have two actions that share the "move" type, one fore moving on land and one for moving in water. See [permission_container](addons/modular_character_controller/core_scripts/permission_container.gd) for details on limiting which actions can play for handling shared types.
+You can also "override" actions by using shared types. Having two actions share the "jump" type where one action handles basic jumps, then a second action for powered up jumps. The second can be added to the player via power up giving them different jumps. See [action_collision](addons/modular_character_controller/core_scripts/action_collision.gd), priority index, for details on action overriding. 
 
 ### Action Collision
 **collision diagram**
-Thinking of actions as objects for a moment, for an action to play it must move through all the actions that are currently playing. Some actions may not collide, allowing the action to freely move through and play, but some actions may collide with others where some kind of interaction may take place. You can define these interactions with [action_collision](https://github.com/PantheraDigital/Modular-Character-Controller-for-Godot/blob/main/modular_character_controller/core_scripts/action_collision.gd).
-
-See the [action_dash](https://github.com/PantheraDigital/Modular-Character-Controller-for-Godot/blob/main/controller_examples/scripts/actions/simple_character/action_dash.gd) and [complex action dash](https://github.com/PantheraDigital/Modular-Character-Controller-for-Godot/blob/main/controller_examples/scripts/actions/example_character/action_dash_with_anim.gd) for examples of action collision.
+Thinking of actions as objects for a moment, for an action to play it must move through all the actions that are currently playing. Some actions may not collide, allowing the action to freely move through and play, but some actions may collide with others where some kind of interaction may take place. You can define these interactions with [action_collision](addons/modular_character_controller/core_scripts/action_collision.gd).
 
 Action Collision also defines a variable for cases where two actions can be selected for a request. This is a special type of collision that happens during selection and is handled by the priority index. The higher priority action will be selected then checked against the playing actions.
+
 Having a character with two jump actions, one for normal jumps and another obtained from a power up giving them special jumps, if the special jump action has its priority index set higher then it will always be chosen over the normal jump action for as long as it is attached to the character.
 
 ### Action Manager
@@ -124,12 +123,12 @@ The Action Manager decouples input from functionality which allows requests to t
 When a request is made, the Action Container selects an Action Node with a type matching the request. Only one action will be played per request. Keep in mind multiple actions can still play at the same time.
 **selection diagram**
 
-Since there can be many actions on a single character some tools are provided for filtering the actions during selection. See [permission container]() for details on preventing groups of Action Nodes from being considered during selection. See [action collision]() for details on choosing a single Action Node when multiple match. Permission profiles are applied first, then collision is used before making a final selection.
+Since there can be many actions on a single character some tools are provided for filtering the actions during selection. See [permission_container](addons/modular_character_controller/core_scripts/permission_container.gd) for details on preventing groups of Action Nodes from being considered during selection. See [action_collision](addons/modular_character_controller/core_scripts/action_collision.gd) for details on choosing a single Action Node when multiple match. Permission profiles are applied first, then collision is used before making a final selection.
 
-The Action Manager also provides additional functions intended to be used by Action Nodes. See the [script]() for details.
+The Action Manager also provides additional functions intended to be used by Action Nodes. See the [script](addons/modular_character_controller/core_scripts/action_manager.gd) for details.
 
 ### Action Container
-[action_container](https://github.com/PantheraDigital/Modular-Character-Controller-for-Godot/blob/main/modular_character_controller/core_scripts/action_container.gd)s hold the actions attached to the Action Manager in a sorted array so that actions can be found using either their node name or by their action type. Because of this unique node names are enforced across all actions attached to one character.
+[action_container](addons/modular_character_controller/core_scripts/action_container.gd)s hold the actions attached to the Action Manager in a sorted array so that actions can be found using either their node name or by their action type. Because of this unique node names are enforced across all actions attached to one character.
 
 This is done this way so actions can be found by their type when a play request happens but also so a specific Action Node can be found using their node name. Node names are used internally (within the action system) when seeking a specific node.
 
@@ -139,9 +138,7 @@ The Permission Container holds permission profiles which indicate the Action Nod
 **permission filtering diagram**
 In this diagram "Profile1" is active in the Action Manager which causes the request for "action3" to do nothing since that Action Node is not listed in Profile1.
 
-See the [ExampleCharacter](https://github.com/PantheraDigital/Modular-Character-Controller-for-Godot/blob/main/controller_examples/scenes/ExampleCharacter.tscn)'s action manager for an example of permission profiles in use.
-
-These profile may be controlled and set from the Action Manager. Here is an example of how that may look if an action were to change the active profile. This jump action changes the character from grounded to flying if the controller performs a double jump. [action_jump_with_transition](https://github.com/PantheraDigital/Modular-Character-Controller-for-Godot/blob/main/controller_examples/scripts/actions/example_character/action_jump_with_transition.gd)
+These profile may be controlled and set from the Action Manager. 
 
 ### Controller
 Controllers are objects that send requests to characters' Action Manager. They may be AI controlled, player controlled, or even some simple logic for sending requests. This may be directly attached to a character or separate.
@@ -156,7 +153,7 @@ While this class is important to the structure of the action system, this exact 
 Keep in mind that requests use the type of action they want to happen. This type does not need to be a match to player input.
 
 ## Debug
-There are two included ways to help with debugging, the [custom_logger](https://github.com/PantheraDigital/Modular-Character-Controller-for-Godot/blob/main/modular_character_controller/debug/scripts/logger.gd) used in action manager and the [action_tree_debug_ui](https://github.com/PantheraDigital/Modular-Character-Controller-for-Godot/blob/main/modular_character_controller/debug/scripts/action_tree_debug_ui.gd).
+There are two included ways to help with debugging, the [custom_logger](addons/modular_character_controller/debug/scripts/logger.gd) used in action manager and the [action_tree_debug_ui](addons/modular_character_controller/debug/scenes/action_tree_debug_ui.tscn).
 
 The logger gives details on the manager during its setup phase and details on action play requests such as collision or if the action does not exist. This is useful for detailed info on the system, just check the log variable in the inspector of an action manager.
 
