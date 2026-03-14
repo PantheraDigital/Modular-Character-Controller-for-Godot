@@ -17,7 +17,7 @@ Tested on Godot versions 4.4, 4.5, 4.6.1
 [Getting Started](#getting-started) \
 | [What Is Included](#what-is-included) \
 | [Set Up](#set-up) \
-| | [Addon/Plugin](#addonplugin) \
+| | [Addon](#addon) \
 | | [Examples](#examples) \
 [Using the Modular Character Controller](#using-the-modular-character-controller) \
 | [Parts](#parts) \
@@ -51,7 +51,7 @@ So, after some planning, I broke everything down and eventually came up with thi
 # Getting Started
 ## What Is Included
 ## Set Up
-### Addon/Plugin
+### Addon
 ### Examples
 
 # Using the Modular Character Controller 
