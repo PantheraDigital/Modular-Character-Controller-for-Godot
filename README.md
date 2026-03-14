@@ -82,9 +82,9 @@ This architecture is built on the idea of public and private systems.
 
 ![Scene tree of player from Godot's TPS demo project.](imgs/player-tree-from-godot-tps-demo.png)
 
-Since the character node is the root of a character scene tree, it is the first node any other object in the level will access when interacting with the character. This makes it the most public since it is the first point of contact and should not hold logic that should not be exposed to all other objects in the level tree.
+Since the character node ("player" in the above example) is the root of a character scene tree, it is the first node any other object in the level will access when interacting with the character. This makes it the most public since it is the first point of contact and should not hold logic that should not be exposed to all other objects in the level tree.
 
-Continuing this, it is expected a character will have systems, in the form of nodes, in it for handling various things (animations, physics, damage, items, etc.). Some of these will also not be intended for use by objects outside the character but are meant to be used by a player, for example, providing input to command the character to do something.
+Continuing this, it is expected a character will have systems, in the form of nodes, in it for handling various things (animations, physics, camera, damage, items, etc.). Some of these will also not be intended for use by objects outside the character but are meant to be used by a player, for example, providing input to command the character to do something.
 
 This architecture separates input handling from the character by using a Controller node. This decoupling keeps functionality more focused and modular since the separation of responsibility makes it so that characters can receive requests from any Controller, or any source.
 
