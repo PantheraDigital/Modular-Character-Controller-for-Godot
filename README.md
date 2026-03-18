@@ -102,11 +102,9 @@ Examples of what an Action could be: Move, Look, Attack, Interact, Get Hit, Reco
 Actions are not things a player would do, or things that would be meta.
 Examples of what an Action is not: Open Inventory, Purchase Item, Level Up, Pause Game, Open Menu
 
-[Action Nodes](addons/modular_character_controller/core_scripts/action_node.gd) handle the logic to perform an action.
+[Action Nodes](addons/modular_character_controller/core_scripts/action_node.gd) handle the logic to perform an action, and may even work together to perform a complicated action. They also handle the logic for interacting with other Action Nodes. See [action_collision](addons/modular_character_controller/core_scripts/action_collision.gd) for more.
 
 This can be tricky as some meta actions that would not be an Action Node may still require the character to do something, such as equipping an item in the UI triggering the character to play an equip animation. While the UI would not be logic in Action Node, a general use Action Node may be used to play the animation.
-
-What an Action Node does will depend on your project.
 
 **Behavior** \
 When designing your actions keep in mind they will only ever be told to play or stop. From this there are two main behaviors that can be used, one shot and toggle.
@@ -170,7 +168,9 @@ When a request is made, the Action Container selects an Action Node with a type 
 
 ![Selection. Only one Action is selected to play in response to a request.](imgs/diagram-action-selection.png)
 
-Since there can be many actions on a single character some tools are provided for filtering the actions during selection. See [permission_container](addons/modular_character_controller/core_scripts/permission_container.gd) for details on preventing groups of Action Nodes from being considered during selection. See [action_collision](addons/modular_character_controller/core_scripts/action_collision.gd) for details on choosing a single Action Node when multiple match. Permission profiles are applied first, then collision is used before making a final selection.
+Since there can be many actions on a single character some tools are provided for filtering the actions during selection. See [permission_container](addons/modular_character_controller/core_scripts/permission_container.gd) for details on preventing groups of Action Nodes from being considered during selection. See [action_collision](addons/modular_character_controller/core_scripts/action_collision.gd) for details on choosing a single Action Node when multiple match. 
+
+The manager performs selection using permission profiles and action types then plays the action. The action nodes themselves handle collision which may prevent them from playing.
 
 The Action Manager also provides additional functions intended to be used by Action Nodes. See the [script](addons/modular_character_controller/core_scripts/action_manager.gd) for details.
 
