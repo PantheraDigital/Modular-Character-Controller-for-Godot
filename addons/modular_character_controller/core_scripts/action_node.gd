@@ -2,10 +2,10 @@ extends Node
 class_name ActionNode
 
 ## Base class for all actions. Extend to implement functionality. [br]
-## Override functions with a single leading '_'. Override other actions for more control.
+## Override functions with a single leading '_' to implement action logic. [br]
+## Override other actions for more control over [ActionNode] behavior.
 # call order:
-# can_play() -> _can_play()
-# play() -> __enter() -> enter_action -> _enter() -> play_action -> _play()
+# play() -> can_play() -> _can_play() -> __enter() -> enter_action -> _enter() -> play_action -> _play()
 # stop() -> stop_action -> _stop() -> __exit() -> exit_action -> _exit()
 
 ## Emitted when [method ActionNode.play] is called. Emitted once if [method ActionNode.play] is called multiple times before the action exits.
@@ -50,11 +50,14 @@ func can_play() -> bool:
 	return is_enabled and _can_play()
 
 
-## [param _params] is arbitrary data passed from the controller to the action. The data expected will be dependant on the implementation in extending classes. [br]
-## Uses [method can_play]. [br]
+## [param _context] holds data related to the current state of [ActionManager]. [code]{&"playing_actions": [ActionNodes], &"permitted_actions" : [StringNames]}[/code] [br]
+## [param _params] is arbitrary data passed from the controller to the action. The data expected will be dependant on the implementation in extending classes. [br][br]
+## Calls [method can_play] then
+## handles collision with other [ActionNode]s that are playing in the given [param _context]. [br]
 ## Emits [signal enter_action] if action is not playing already, then emits [signal play_action].
-func play(_params: Dictionary = {}) -> bool:
-	if !can_play(): 
+func play(_context: Dictionary[StringName, Array] = {}, _params: Dictionary = {}) -> bool:
+	if !can_play() or \
+	ActionCollision.handle_collision(self, _context[&"playing_actions"]) == ActionCollision.CollisionType.BLOCK: 
 		return false
 	
 	if !is_playing:
@@ -62,7 +65,7 @@ func play(_params: Dictionary = {}) -> bool:
 		is_playing = true
 	
 	play_action.emit(self)
-	_play(_params)
+	_play(_params.merged(_context, true) if _context else _params)
 	return true
 
 ## Force exit action if playing. [br]
@@ -76,7 +79,7 @@ func stop() -> bool:
 	return true
 
 
-## Override these functions unless signal order needs to be changed.
+## Override these functions to implement action logic.
 #region Custom Overrides
 ## Override to determin if the action should play.
 func _can_play() -> bool:

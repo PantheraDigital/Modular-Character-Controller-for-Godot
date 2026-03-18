@@ -19,6 +19,53 @@ var action_node: ActionNode
 var priority_index: int
 
 
+## Returns the [ActionNode] with the highest priority using [member ActionCollision.priority_index]. [br]
+## [ActionNode]s without [ActionCollision] are treated as lowest priority. If no [ActionNode] has [ActionCollision] 
+## the last action in [param actions] will be returned.
+static func get_action_with_priority(actions: Array[ActionNode]) -> ActionNode:
+	var priority_action: ActionNode = null
+	for action: ActionNode in actions:
+		if !priority_action or !priority_action.collision:
+			priority_action = action
+			continue
+		
+		if priority_action.collision and !action.collision:
+			continue
+		
+		if priority_action.collision.priority_index < action.collision.priority_index:
+			priority_action = action
+	
+	return priority_action
+
+## Tests the [ActionCollision] of [param action] against each [ActionCollision] in [param test_actions]. [br]
+## Returns the strongest form of [enum ActionCollision.CollisionType] encountered. [br]
+## An [ActionNode] with not [ActionCollision] is treated as a [constant PASS]. [br]
+## If no collisions [constant BLOCK] the [param action], then all [constant COLLIDE] cases are handled with [code]action.collision.hit(test_action)[/code].
+static func handle_collision(action: ActionNode, test_actions: Array[ActionNode]) -> CollisionType:
+	if !action.collision:
+		return CollisionType.PASS
+	
+	var collisions: Array[ActionCollision] = []
+	for test_action: ActionNode in test_actions:
+		if !test_action.collision:
+			continue
+		
+		match test_action.collision.collides_with(action.collision):
+			CollisionType.PASS:
+				continue
+			CollisionType.COLLIDE:
+				collisions.push_back(test_action.collision)
+			CollisionType.BLOCK:
+				return CollisionType.BLOCK
+	
+	if collisions:
+		for collision: ActionCollision in collisions:
+			action.collision.hit(collision)
+		return CollisionType.COLLIDE
+	
+	return CollisionType.PASS
+
+
 func _init(owning_action: ActionNode) -> void:
 	action_node = owning_action
 	priority_index = 0

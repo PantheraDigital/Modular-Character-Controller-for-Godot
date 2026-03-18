@@ -165,12 +165,25 @@ func _get_action(action_type: StringName, filter_type: GetFilterType) -> ActionN
 	if test_batch.size() == 0:
 		return null
 	
-	return __get_action_with_priority(test_batch)
+	return ActionCollision.get_action_with_priority(test_batch)
+
+## Returns the "cpntext" of the [ActionManager]. [br]
+## [codeblock]
+## {
+##  &"playing_actions"   : [ActionNodes], # currently playing actions
+##  &"permitted_actions" : [StringNames]  # active permission profile
+## }
+## [/codeblock]
+func _get_context() -> Dictionary[StringName, Array]:
+	return {
+		&"playing_actions":_playing_actions, 
+		&"permitted_actions":_action_permissions.get_permissions(_active_permission_profile) if _action_permissions and _action_permissions.is_valid() else [&"all"]
+		}
 #endregion
 
 ## Should not be accessed from outside this class.
 #region Private Functions
-## Find and play an action. Performs collision check between action to play and actions in [member _playing_actions]. [br]
+## Find and play an action if it is permitted. [br]
 ## [param filter_type] specifies how the action should be searched for. [br]
 ## [param action_type] is the [member ActionNode.TYPE]. [br]
 ## [param action_params] is the data to give to [ActionNode].
@@ -182,37 +195,15 @@ func __play_action(filter_type: GetFilterType, action_type: StringName, action_p
 			(_character.name + " play private action: " + action_type + " | " + str(new_action))
 			if filter_type == GetFilterType.PRIVATE_ACTIONS else 
 			(_character.name + " play action: " + action_type + " | " + str(new_action)) )
+		
+		if !new_action or !new_action.can_play(): 
+			CustomLogger._log_message( "-- valid: " + "false" if !new_action else 
+				new_action.name + " | can play: " + str(new_action.can_play()) )
 	
-	if !new_action or !new_action.can_play(): 
-		if _log: CustomLogger._log_message( "-- valid: " + "false" if !new_action else 
-			new_action.name + " | can play: " + str(new_action.can_play()) )
+	if !new_action:
 		return false
 	
-	# playing actions filter
-	if !new_action.collision or _playing_actions.is_empty():
-		new_action.play(action_params)
-		return true
-	
-	var collisions: Array[ActionCollision] = []
-	for action: ActionNode in _playing_actions:
-		if !action.collision:
-			continue
-		
-		match action.collision.collides_with(new_action.collision):
-			ActionCollision.CollisionType.PASS:
-				continue
-			ActionCollision.CollisionType.COLLIDE:
-				if _log: CustomLogger._log_message("-- collision check: collides with " + str(action))
-				collisions.push_back(action.collision)
-			ActionCollision.CollisionType.BLOCK:
-				if _log: CustomLogger._log_message("-- collision check: blocked by " + str(action))
-				return false
-	
-	if collisions:
-		for collision in collisions:
-			new_action.collision.hit(collision)
-	
-	return new_action.play(action_params)
+	return new_action.play(_get_context(), action_params)
 
 ## Add the [param action] to [member _action_container] if the [ActionNode]'s [member Node.name] is not already used. [br]
 ## Enables [ActionNode]. Sets [ActionNode]'s [member ActionNode._character] and [member ActionNode._manager] if they are defined in the action.
@@ -243,23 +234,6 @@ func __deregister_action(action: ActionNode) -> void:
 	action.exit_action.disconnect(__on_action_exit)
 	action.disable()
 	if _log: CustomLogger._log_message(str(_character) + " deregister: " + action.name)
-
-## Returns the [ActionNode] with the highest [member ActionCollision.priority_index]. If an [ActionNode] does not have an [ActionCollision] it is treated as having the lowest priority.
-func __get_action_with_priority(actions: Array[ActionNode]) -> ActionNode:
-	# use collision to get final action
-	var priority_action: ActionNode = null
-	for action: ActionNode in actions:
-		if !priority_action or !priority_action.collision:
-			priority_action = action
-			continue
-		
-		if priority_action.collision and !action.collision:
-			continue
-		
-		if priority_action.collision.priority_index < action.collision.priority_index:
-			priority_action = action
-	
-	return priority_action
 
 ## Returns all children that are [ActionNode]. Is recursive. [param node] defaultly set to [code]self[/code].
 func __get_child_actions(node: Node = self) -> Array[ActionNode]:
