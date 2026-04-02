@@ -1,0 +1,108 @@
+Action Container
+- added get_all_actions
+
+
+
+--- NOTE ---
+type seperation may result in more nodes from selection trees
+but this still fights state reduncies and improves dynamic changes in behavior 
+
+--- TODO ---
+
+action node
+- remove type
+- switch params to array
+- use callv to play
+- - action nodes can now specify params required
+- - should improve clearity and prevent error with params sent to actions from requests
+- add requester param to play for tracking of objects sending requests
+
+action collision
+- remove priority
+(to override actions change the mapping in action tree)
+
+Action Player
+- remove Action Container
+- action nodes are direct decendants
+- add dict[request, action node]
+- - holds available actions and requests
+- add action tree
+- - maps actions to requests
+- - change action tree to change mappings
+- - change start node to change mappings
+- different player types use the tree differently
+- - path tree
+- - profile tree
+
+
+current permission profile maps action nodes by name to states
+- this hides the action types available 
+
+action tree
+- shows action types permitted and the action nodes tied to the types
+- prevents duplicate types more clearly
+
+
+
+problem: 
+	!! behavioral
+	need to allow different ways to change permitted actions
+	- playing actions changes permitted actions based on paths
+	- character states and events change the set of permitted actions
+	
+	actions play and handle themselves
+	action player handles state
+	- will listen for events to change action tree branch
+	- - still causes new player per new tree ---
+	- - action tree holds behaviors that player uses
+	- - - player can be general and switch behavior to the desired behavior of tree by hooking up to its events
+	- where should events be stored and handled
+	
+	action player (does too much?)
+	- plays actions
+	- acts as action bank
+	- uses tree as changing api
+	
+	!! structural
+	need to store actions and requests in a more visiable and changeable mannor
+	- having request types in action nodes hides the requests available at any time 
+	- seperateing requests from action nodes allows for easier and dynamic mapping
+	
+	!! seperation of request type and action node can break calls
+	mismatch of params to action expecting request type specific params
+	
+	
+	this system is:
+	sets of action nodes that can be played together
+	
+
+
+
+
+
+
+Action tree
+- request router
+- request -> Action Node
+
+Action Bank
+- functionality
+
+Action Player
+- routs requests to action in bank
+
+
+
+path tree
+- progresses on action play
+
+profile tree
+- progresses on specific event
+- - action or character state based
+- - would require action player to know the actions it holds to tie an event to a specific action
+
+
+action trees hold logic for specific behavior
+- this requires a new action player for each tree
+- and requires actions know which tree is in use
+- and may require actions to handle multiple trees or have actions specific for different trees
