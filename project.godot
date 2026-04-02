@@ -1,0 +1,8 @@
+config_version=5
+
+[application]
+
+config/name="Test (action player)"
+run/main_scene="uid://odq2fwdayx0q"
+config/features=PackedStringArray("4.4", "Forward Plus")
+config/icon="res://icon.svg"
