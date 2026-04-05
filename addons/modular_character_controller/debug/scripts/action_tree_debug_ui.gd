@@ -14,6 +14,7 @@ const ACTIVE_COLOR_TXT_PROFILE: Color = Color(0.2,1,1,1)
 const INACTIVE_COLOR_BG: Color = Color(0,0,0,0.15)
 const INACTIVE_COLOR_TXT: Color = Color(1,1,1,0.6)
 
+@export var debug_log: bool
 
 var camera: Camera3D
 var profile_ui_container: HBoxContainer
@@ -22,6 +23,7 @@ var action_ui_container: VBoxContainer
 var label_dict: Dictionary[StringName, Dictionary] 
 var action_player: ActionPlayer
 var action_container: ActionContainer
+var action_remapper: ActionMapRemapper
 
 
 func _ready() -> void:
@@ -39,11 +41,23 @@ func _ready() -> void:
 	action_player = get_parent()
 	action_container = action_player.find_child("ActionContainer", false)
 	
-	action_player.action_map_changed.connect(_on_managed_actions_change)
+	action_player.action_map_changed.connect(_on_action_map_changed)
 	action_container.child_entered_tree.connect(_on_action_container_child_entered) 
 	action_container.child_exiting_tree.connect(_on_action_container_child_exiting)
 	
-	call_deferred(&"_on_managed_actions_change", action_player.action_map)
+	var temp_array: Array = action_player.find_children("*", "ActionMapRemapper")
+	action_remapper = temp_array[0] if !temp_array.is_empty() else null
+	if action_remapper:
+		action_remapper.maps_changed.connect(_on_remapper_change)
+	
+	if debug_log: CustomLogger._log_message(str(self) + " - READY")
+	call_deferred(&"_late_ready")
+
+func _late_ready() -> void:
+	_on_action_map_changed(action_player.action_map)
+	if action_remapper:
+		_on_remapper_change(action_remapper.active_map, action_remapper.maps)
+	if debug_log: CustomLogger._log_message(str(self) + " - LATE READY")
 
 func _process(_delta: float) -> void:
 	if !camera:
@@ -141,21 +155,32 @@ func _clear_chidren(node: Node, free_nodes: bool = false) -> void:
 		if free_nodes:
 			node_child.free()
 
-func _full_clear() -> void:
-	_clear_chidren(action_ui_container, true)
-	
+func _clear_label_dict() -> void:
 	for element: Dictionary in label_dict.values():
 		if !action_container.action_dict.has(element[&"action_name"]):
 			continue
 		var action: ActionNode = action_container.action_dict[element[&"action_name"]]
-		action.enter_action.disconnect(_set_label_playing)
-		action.exit_action.disconnect(_set_label_not_playing)
+		if action.enter_action.is_connected(_set_label_playing):
+			action.enter_action.disconnect(_set_label_playing)
+		if action.exit_action.is_connected(_set_label_not_playing):
+			action.exit_action.disconnect(_set_label_not_playing)
 	
 	label_dict.clear()
 
 
-func _on_managed_actions_change(action_map: Dictionary[StringName, StringName]) -> void:
-	_full_clear()
+func _on_remapper_change(active_map: StringName, maps: Dictionary[StringName, RequestActionArray]) -> void:
+	_clear_chidren(profile_ui_container, true)
+	for map_name: StringName in maps.keys():
+		var label: Label = _create_label(map_name, ACTIVE_COLOR_TXT, ACTIVE_COLOR_BG) \
+			if active_map == map_name else \
+			_create_label(map_name, INACTIVE_COLOR_TXT, INACTIVE_COLOR_BG)
+		profile_ui_container.add_child(label)
+
+func _on_action_map_changed(action_map: Dictionary[StringName, StringName]) -> void:
+	_clear_chidren(action_ui_container, true)
+	_clear_label_dict()
+	
+	# add requests and their actions
 	for request: StringName in action_map.keys():
 		if label_dict.has(request):
 			continue
@@ -172,6 +197,7 @@ func _on_managed_actions_change(action_map: Dictionary[StringName, StringName]) 
 			action.exit_action.connect(_set_label_not_playing)
 			if action.is_playing:
 				_set_label_playing(action)
+	if debug_log: CustomLogger._log_message(str(self) + " - ui refresh: " + str(action_map))
 
 func _on_action_container_child_entered(node:Node) -> void:
 	var action: ActionNode = node as ActionNode

@@ -1,8 +1,10 @@
 extends Node3D
 
 
+signal key_press
+
 @export var action_player: ActionPlayer
-@export var action_map: ActionMap
+@export var action_map: ActionMapRemapper
 @export var action_container: ActionContainer
 
 var node: ActionNode = ActionNode.new()
@@ -10,11 +12,9 @@ var node: ActionNode = ActionNode.new()
 
 func _ready() -> void:
 	node.name = &"Action3"
-	action_player.debug_log = true
-	action_container.debug_log = true
 	
 	call_deferred(&"run_tests", 
-	test_play_stop,
+	test_new_mapping,
 	(func():
 		print("player map  ", action_player.action_map)
 		print("container   ", action_container.action_dict)
@@ -23,11 +23,16 @@ func _ready() -> void:
 		self.print_orphan_nodes()
 	))
 
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_pressed() and event.is_action("ui_accept"):
+		key_press.emit()
+
 func run_tests(test_stack: Array[Dictionary], pre_test_call: Callable = func():pass, post_test_call: Callable = func():pass):
 	printt("-----", "START", "-----")
 	var print_bar: bool = false
 	for test: Dictionary in test_stack:
 		await get_tree().create_timer(0.7).timeout
+		await key_press
 		print()
 		if print_bar:
 			print("-----------------------------------------")

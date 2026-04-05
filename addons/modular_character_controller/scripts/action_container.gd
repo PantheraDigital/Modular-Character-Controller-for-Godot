@@ -18,6 +18,8 @@ func _ready() -> void:
 			continue
 		
 		register_action(action)
+	
+	if debug_log: CustomLogger._log_message(str(self) + " - READY: \n\taction dict" + str(action_dict))
 
 
 func set_actions_enabled(action_names: Array[StringName]) -> void:

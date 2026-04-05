@@ -7,12 +7,13 @@ signal action_map_changed(action_map: Dictionary[StringName, StringName])
 
 @export var action_map: Dictionary[StringName, StringName]: # Request, Action Node.name
 	set(value):
-		if stop_all_actions_on_full_remap:
+		if !Engine.is_editor_hint() and stop_all_actions_on_full_remap:
 			for action_name: StringName in _action_container.playing_action_names:
 				_action_container.action_dict[action_name].stop()
 		
 		action_map = value
 		action_map_changed.emit(action_map)
+		if !Engine.is_editor_hint() and debug_log: CustomLogger._log_message(str(self) + " - action map set: " + str(action_map))
 
 @export var stop_all_actions_on_full_remap: bool
 @export var debug_log: bool
@@ -20,7 +21,7 @@ signal action_map_changed(action_map: Dictionary[StringName, StringName])
 var _action_container: ActionContainer
 
 
-func _ready() -> void:
+func _enter_tree() -> void:
 	_action_container = find_child("ActionContainer", false)
 	if !_action_container:
 		_action_container = ActionContainer.new()
@@ -29,11 +30,13 @@ func _ready() -> void:
 		add_child(_action_container)
 		_action_container.owner = get_tree().edited_scene_root if get_tree() and get_tree().edited_scene_root else self
 		return
-	
+
+func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
 	
 	_action_container.set_actions_enabled(action_map.values())
+	if debug_log: CustomLogger._log_message(str(self) + " - READY: \n\taction map: " + str(action_map))
 
 
 func play(request: StringName, params: Dictionary = {}) -> void:
@@ -80,6 +83,7 @@ func set_request(request: StringName, action_name: StringName) -> void:
 		return
 	action_map[request] = action_name
 	action_map_changed.emit(action_map)
+	if debug_log: CustomLogger._log_message(str(self) + " - request " + request + " set: " + str(action_map))
 
 
 func get_context() -> Dictionary[StringName, Variant]:
