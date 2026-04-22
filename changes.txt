@@ -1,3 +1,0 @@
-Add:
-action node stop delay
-action remapper map changes from action player
