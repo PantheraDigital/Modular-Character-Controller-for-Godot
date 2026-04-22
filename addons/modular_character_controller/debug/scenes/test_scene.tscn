@@ -1,0 +1,52 @@
+[gd_scene load_steps=6 format=3 uid="uid://odq2fwdayx0q"]
+
+[ext_resource type="Script" uid="uid://dyvcmkhqnm1un" path="res://addons/modular_character_controller/debug/scripts/test_scene.gd" id="1_dg47v"]
+[ext_resource type="Script" uid="uid://cvhum0gbo0c8b" path="res://addons/modular_character_controller/scripts/action_player.gd" id="2_v1m0f"]
+[ext_resource type="PackedScene" uid="uid://d3x77kisvn7lk" path="res://addons/modular_character_controller/debug/scenes/action_tree_debug_ui.tscn" id="3_huw24"]
+[ext_resource type="Script" uid="uid://c8d3a04ksuwnv" path="res://addons/modular_character_controller/scripts/action_map_remapper.gd" id="5_bldor"]
+[ext_resource type="Script" uid="uid://cly0emxejp1y1" path="res://addons/modular_character_controller/scripts/action_node.gd" id="5_w7bws"]
+
+[node name="Node3D" type="Node3D" node_paths=PackedStringArray("action_player", "action_remapper")]
+script = ExtResource("1_dg47v")
+action_player = NodePath("ActionPlayer")
+action_remapper = NodePath("ActionPlayer/ActionMapRemapper")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+
+[node name="ActionPlayer" type="Node" parent="."]
+script = ExtResource("2_v1m0f")
+action_map = Dictionary[StringName, NodePath]({
+&"Jump": NodePath("Jump"),
+&"Look": NodePath(""),
+&"Move": NodePath("Move")
+})
+debug_log = true
+metadata/_custom_type_script = "uid://cvhum0gbo0c8b"
+
+[node name="ActionTreeDebugUi" parent="ActionPlayer" instance=ExtResource("3_huw24")]
+debug_log = true
+
+[node name="Move" type="Node" parent="ActionPlayer"]
+script = ExtResource("5_w7bws")
+metadata/_custom_type_script = "uid://cly0emxejp1y1"
+
+[node name="Jump" type="Node" parent="ActionPlayer"]
+script = ExtResource("5_w7bws")
+metadata/_custom_type_script = "uid://cly0emxejp1y1"
+
+[node name="ActionMapRemapper" type="Node" parent="ActionPlayer"]
+script = ExtResource("5_bldor")
+active_map = &"Ground"
+maps = Dictionary[StringName, Dictionary]({
+&"Air": {
+&"Attack": NodePath(""),
+&"Move": NodePath("../Move")
+},
+&"Ground": {
+&"Attack": NodePath(""),
+&"Jump": NodePath("../Jump"),
+&"Move": NodePath("../Move")
+}
+})
+debug_log = true
+metadata/_custom_type_script = "uid://c8d3a04ksuwnv"
