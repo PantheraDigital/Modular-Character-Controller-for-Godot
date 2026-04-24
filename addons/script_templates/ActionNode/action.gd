@@ -1,11 +1,17 @@
-# meta-name: Toggle Action
-# meta-description: Action that will run until told to stop. 
+# meta-name: Action
+# meta-description: Script with all override functions from ActionNode.
 # meta-default: true
 extends ActionNode
 
 
 
-func _can_play() -> bool:
+func _on_enable() -> void:
+	pass
+
+func _on_disable() -> void:
+	pass
+
+func _on_can_play() -> bool:
 	return true
 
 func _on_enter() -> void:
