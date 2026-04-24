@@ -53,7 +53,7 @@ Input is also separated from the character, following the Model View Controller 
 
 ## Parts
 ### Action Node
-ActionNodes hold the game logic needed for a character to perform a specific task (action) related to the Nodes in the character. Examples would be moving, looking, attacking, climbing, and even taking damage. 
+[ActionNodes](addons/modular_character_controller/scripts/action_node.gd) hold the game logic needed for a character to perform a specific task (action) related to the Nodes in the character. Examples would be moving, looking, attacking, climbing, and even taking damage. 
 
 The collection of ActionNodes on a character should represent the different things they may do during game play. However, ActionNodes are designed to be removed and added during gameplay to allow characters to be more dynamic, so all ActionNodes do not need to be attached to the character from the start.
 
@@ -91,7 +91,7 @@ and to stop: \
 When thinking in terms of a state machine, imagine ActionNodes as the parts of a single state, coming together to make that state. By doing this you can identify shared logic between states that can be a single ActionNode.
 
 ### Action Player
-The ActionPlayer Plays and Stops actions, and allows for control over which actions are accessible. The way this works is similar to an API by mapping requests to ActionNodes.
+The [ActionPlayer](addons/modular_character_controller/scripts/action_player.gd) Plays and Stops actions, and allows for control over which actions are accessible. The way this works is similar to an API by mapping requests to ActionNodes.
 
 This looks like \
 `{&"move":^"Move", &"jump":^"Jump"}`, where `&"move"` and `&"jump"` are the requests and `^"Move"` and `^"Jump"` are the ActionNodes attached to the ActionPlayer.
@@ -111,7 +111,7 @@ To change the actions available, or to change which action is called on by a req
 The map can be viewed as the "state" of the character the ActionPlayer is attached to since the map dictates the actions available to the character at a given time.
 
 ### Action Map Remapper
-The ActionMapRemapper is simply a tool to manage multiple mappings a character may have. While the ActionPlayer only holds one map, this holds multiple, allowing for easier swapping during gameplay.
+The [ActionMapRemapper](addons/modular_character_controller/scripts/action_map_remapper.gd) is simply a tool to manage multiple mappings a character may have. While the ActionPlayer only holds one map, this holds multiple, allowing for easier swapping during gameplay.
 
 The remapper holds maps:
 ```
@@ -129,7 +129,7 @@ This will change the map in ActionPlayer to `{&"attack":^"Attack"}` allowing the
 This can be done from within ActionNodes, effectively allowing actions to dictate what a character can do while that action is taking place.
 
 ### Controller
-A Controller can be any object that interacts with the ActionPlayer on a character to have it do things, but a generic script is provided as a base.
+A [Controller](addons/modular_character_controller/scripts/controller.gd) can be any object that interacts with the ActionPlayer on a character to have it do things, but a generic script is provided as a base.
 
 Controllers may be in the character scene or separate. \
 Due to how the ActionPlayer works, a character can have one or many controllers, and a controller may have one or many characters. \
@@ -158,9 +158,9 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## Debug
 ### UI
-A UI debugger is provided. It works with and without ActionMapRemapper. Just add the scene as a child to ActionPlayer. The UI will display all requests, the ActionNodes mapped to those requests, if the action is playing, and the names of the maps ActionMapRemapper adds.
+A [UI debugger](addons/modular_character_controller/debug/scenes/action_tree_debug_ui.tscn) is provided. It works with and without ActionMapRemapper. Just add the scene as a child to ActionPlayer. The UI will display all requests, the ActionNodes mapped to those requests, if the action is playing, and the names of the maps ActionMapRemapper adds.
 
 ### Logger
-ActionPlayer, ActionMapRemapper, and ActionPlayerDebugUI make use of the CustomLogger class to print out useful debug info if their debug variable is enabled.
+ActionPlayer, ActionMapRemapper, and ActionPlayerDebugUI make use of the [CustomLogger](addons/modular_character_controller/debug/scripts/logger.gd) class to print out useful debug info if their debug variable is enabled.
 
 This class is named CustomLogger to prevent problems with the Logger class added in Godot 4.5.
