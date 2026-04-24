@@ -41,7 +41,7 @@ var is_enabled: bool = false
 ## Helper function to be used by [ActionNode] signals. [br]
 ## Exits the [param action] after a short delay using [SceneTreeTimer].
 static func delayed_exit(action: ActionNode) -> void:
-	var timer: SceneTreeTimer = action.get_tree().create_timer(2.1)
+	var timer: SceneTreeTimer = action.get_tree().create_timer(0.1)
 	timer.timeout.connect(action._exit)
 
 
