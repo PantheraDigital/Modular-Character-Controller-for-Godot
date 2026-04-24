@@ -91,7 +91,7 @@ and to stop: \
 When thinking in terms of a state machine, imagine ActionNodes as the parts of a single state, coming together to make that state. By doing this you can identify shared logic between states that can be a single ActionNode.
 
 ### Action Player
-The [ActionPlayer](addons/modular_character_controller/scripts/action_player.gd) Plays and Stops actions, and allows for control over which actions are accessible. The way this works is similar to an API by mapping requests to ActionNodes.
+The [ActionPlayer](addons/modular_character_controller/scripts/action_player.gd) provides a way for objects outside of the character to Play and Stop actions attached to it. It also allows for control over which actions are accessible to those external objects. The way this works is similar to an API by mapping requests to ActionNodes.
 
 This looks like \
 `{&"move":^"Move", &"jump":^"Jump"}`, where `&"move"` and `&"jump"` are the requests and `^"Move"` and `^"Jump"` are the ActionNodes attached to the ActionPlayer.
@@ -108,7 +108,10 @@ To change the actions available, or to change which action is called on by a req
 
 `action_player.set_request(self, &"attack", ^"Attack")` will change, or add, a request to the map and follows the same rules as `set_action_map`.
 
-The map can be viewed as the "state" of the character the ActionPlayer is attached to since the map dictates the actions available to the character at a given time.
+Example of ActionPlayer with ActionNodes as children and its action map set in the inspector: \
+![](imgs/ActionPlayer.png) ![](imgs/ActionPlayerInspector.png)
+
+Note that not all ActionNodes need to be added to a map. The map acts as a public interface for other objects to request actions. In the above, actions TakeDamage and Die are called directly from the damage system on the character but will never be called from an object external to the character.
 
 ### Action Map Remapper
 The [ActionMapRemapper](addons/modular_character_controller/scripts/action_map_remapper.gd) is simply a tool to manage multiple mappings a character may have. While the ActionPlayer only holds one map, this holds multiple, allowing for easier swapping during gameplay.
