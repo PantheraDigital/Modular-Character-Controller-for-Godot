@@ -12,12 +12,14 @@ class_name ActionNode
 ## [/codeblock]
 
 # call order:
-# play() -> can_play() -> _can_play() -> ActionCollider.handle_collision() -> _enter() -> _on_enter() -> signal enter_action -> _play() -> signal play_action
+# play() -> can_play() -> _can_play() -> signal going_to_play_action -> _enter() -> _on_enter() -> signal enter_action -> _play() -> signal play_action
 # stop() -> _stop() -> signal stop_action -> _exit() -> _on_exit() -> signal exit_action
 #
 # Natural exit: when this action calls _exit()
 # Interuption: when stop() is called in or out of this class
 
+## Emitted when [method ActionNode.play] is called, but before anything is done.
+signal going_to_play_action(action: ActionNode)
 ## Emitted when [method ActionNode.play] is called if the action is not already playing.
 signal enter_action(action: ActionNode)
 ## Emitted when [method ActionNode.play] is called.
@@ -27,6 +29,7 @@ signal stop_action(action: ActionNode)
 ## Emitted when action ends if the action is playing. Represents the action naturally stopping itself.
 signal exit_action(action: ActionNode)
 
+const HELPER_DELAY: float = 0.1
 
 @onready var _action_player: ActionPlayer = get_parent()
 
@@ -38,15 +41,33 @@ var is_playing: bool = false
 var is_enabled: bool = false
 
 
-## Helper function to be used by [ActionNode] signals. [br]
-## Exits the [param action] after a short delay using [SceneTreeTimer].
-static func delayed_exit(action: ActionNode) -> void:
-	var timer: SceneTreeTimer = action.get_tree().create_timer(0.1)
-	timer.timeout.connect(action._exit)
-
-
 func _exit_tree() -> void:
 	disable()
+
+
+#region Helper Functions
+## Helper function to be used by [ActionNode] signals. [br]
+## Exits the [ActionNode] this is called from after a short delay using [SceneTreeTimer].
+func delayed_exit_self(_action: ActionNode) -> void:
+	var timer: SceneTreeTimer = get_tree().create_timer(HELPER_DELAY)
+	timer.timeout.connect(self._exit)
+
+## Helper function to be used by [ActionNode] signals. [br]
+## Exits the [ActionNode] this is called from right away.
+func immediate_exit_self(_action: ActionNode) -> void:
+	self._exit()
+
+## Helper function to be used by [ActionNode] signals. [br]
+## Stops the [ActionNode] this is called from after a short delay using [SceneTreeTimer].
+func delayed_stop_self(_action: ActionNode) -> void:
+	var timer: SceneTreeTimer = get_tree().create_timer(HELPER_DELAY)
+	timer.timeout.connect(self.stop)
+
+## Helper function to be used by [ActionNode] signals. [br]
+## Stops the [ActionNode] this is called from right away.
+func immediate_stop_self(_action: ActionNode) -> void:
+	self.stop()
+#endregion
 
 
 ## Prepare the action to be in a playable state.
@@ -54,25 +75,22 @@ func enable() -> void:
 	is_enabled = true
 	_on_enable()
 
-## Prepare the action to be in an unplayable state. [br]
-## Performs final clean up. [br][br]
-## Emits [signal exit_action]
+## Prepare the action to be in an unplayable state. 
 func disable() -> void:
 	is_enabled = false
 	_on_disable()
-	is_playing = false
-	exit_action.emit(self)
 
 ## If this action can play.
 func can_play() -> bool:
-	return is_enabled and _on_can_play()
+	return is_enabled and _can_play()
 
 ## [param _params] is arbitrary data needed for action to play. [br][br]
-## Calls [method can_play] then handles collision with other [ActionNode]s that are playing in [ActionPlayer] using [code]_action_player.get_playing_actions()[/code]. [br]
 ## Emits [signal enter_action] if action is not playing already, then emits [signal play_action].
 func play(_params: Dictionary = {}) -> bool:
 	if !can_play(): 
 		return false
+	
+	going_to_play_action.emit(self)
 	
 	if !is_playing:
 		_enter()
@@ -122,13 +140,12 @@ func _on_enable() -> void:
 
 ## Clean up for when the action becomes unplayable, such as leaving the [SceneTree]. [br]
 ## Use for clean up of variables that should not stay set when action is disabled, AKA in a dormant state.
-## This is when the action is held somewhere but is not expected to play. [br][br]
-## Called before [member is_playing] set to [code]false[/code], and [signal exit_action].
+## This is when the action is held somewhere but is not expected to play.
 func _on_disable() -> void:
 	pass
 
 ## Override to determin if the action should play. Only called if the action is enabled.
-func _on_can_play() -> bool:
+func _can_play() -> bool:
 	return true
 
 ## Override to run code when action starts. Not called again till action is exited. [br]

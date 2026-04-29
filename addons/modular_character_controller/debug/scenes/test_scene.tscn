@@ -23,7 +23,9 @@ action_map = Dictionary[StringName, NodePath]({
 debug_log = true
 metadata/_custom_type_script = "uid://cvhum0gbo0c8b"
 
-[node name="ActionTreeDebugUi" parent="ActionPlayer" instance=ExtResource("3_huw24")]
+[node name="ActionTreeDebugUi" parent="ActionPlayer" node_paths=PackedStringArray("action_player", "action_remapper") instance=ExtResource("3_huw24")]
+action_player = NodePath("..")
+action_remapper = NodePath("../ActionMapRemapper")
 debug_log = true
 
 [node name="Move" type="Node" parent="ActionPlayer"]
