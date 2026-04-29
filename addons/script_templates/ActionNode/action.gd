@@ -11,7 +11,7 @@ func _on_enable() -> void:
 func _on_disable() -> void:
 	pass
 
-func _on_can_play() -> bool:
+func _can_play() -> bool:
 	return true
 
 func _on_enter() -> void:

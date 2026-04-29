@@ -4,9 +4,8 @@ extends ActionNode
 
 
 func _ready() -> void:
-	# can also place in _play()
-	play_action.connect(func(action:ActionNode): action._exit()) # queue exit at end of play
-	#play_action.connect(delayed_exit) # queue exit after delay
+	play_action.connect(immediate_exit_self) # queue exit at end of play
+	#play_action.connect(delayed_exit_self) # queue exit after HELPER_DELAY
 
 func _can_play() -> bool:
 	return true

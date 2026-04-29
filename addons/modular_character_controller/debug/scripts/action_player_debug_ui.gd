@@ -1,5 +1,12 @@
 extends Control
 
+## Script for UI to display [ActionPlayer] and [ActionMapRemapper].
+##
+## Shows actions, and the [ActionNodes] mapped to those actions, in [member ActionPlayer.action_map]
+## from [ActionPlayer]. If [ActionMapRemapper] is provided then its maps will be shown too. [br]
+## Adding a [NodePath] to a camera node will make it so the UI is only shown to that camera when
+## it is [member current].
+
 
 const PLAYING_COLOR_BG: Color = Color(0.133, 0.55, 0.133, 0.4)
 const PLAYING_COLOR_TXT: Color = Color(1,1,1,1)
@@ -11,6 +18,9 @@ const ACTIVE_COLOR_TXT_PROFILE: Color = Color(0.2,1,1,1)
 const INACTIVE_COLOR_BG: Color = Color(0,0,0,0.15)
 const INACTIVE_COLOR_TXT: Color = Color(1,1,1,0.6)
 
+@export var action_player: ActionPlayer
+@export var action_remapper: ActionMapRemapper
+@export_node_path("Camera2D", "Camera3D") var camera_path: NodePath
 @export var debug_log: bool
 
 var profile_ui_container: HBoxContainer
@@ -19,29 +29,46 @@ var action_ui_container: VBoxContainer
 ## { ActionNode.name: {"label":Label, "timestamp":int} }
 var label_dict: Dictionary[StringName, Dictionary] 
 
-var action_player: ActionPlayer
-var action_remapper: ActionMapRemapper
+var camera: Node
 
 
 func _ready() -> void:
 	action_ui_container = find_child("ActionContainer")
 	profile_ui_container = find_child("ProfileContainer")
 	
-	action_player = get_parent()
+	if !action_player:
+		push_warning(owner, ": ", name, " has no ActionPlayer")
+		return
 	
 	action_player.ready.connect(_late_ready, CONNECT_ONE_SHOT)
 	action_player.action_map_changed.connect(_on_action_map_changed)
 	action_player.child_entered_tree.connect(_on_action_container_child_entered) 
 	action_player.child_exiting_tree.connect(_on_action_container_child_exiting)
 	
-	var temp_array: Array = action_player.find_children("*", "ActionMapRemapper")
-	action_remapper = temp_array[0] if !temp_array.is_empty() else null
+	if camera_path:
+		camera = get_node(camera_path)
+		if camera is Camera2D or camera is Camera3D:
+			visible = camera.current
+		else:
+			camera = null
+			visible = false
+			push_warning(owner, ": ", name, " invalid Camera Node")
 	
 	if debug_log: CustomLogger._log_message(str(self) + " - READY 1/2")
 
 func _late_ready() -> void:
 	_on_action_map_changed(action_player.action_map)
 	if debug_log: CustomLogger._log_message(str(self) + " - READY 2/2")
+
+func _process(_delta: float) -> void:
+	if !camera:
+		return
+	
+	if camera.current:
+		if !visible:
+			visible = true
+	elif visible:
+		visible = false
 
 
 ## Creates a [Label] with a [ColorRect] background.

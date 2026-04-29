@@ -184,6 +184,14 @@ func get_actions() -> Array[ActionNode]:
 			result.push_back(_action_container[path])
 	return result
 
+## Return a [Dictionary] of [NodePath] : [ActionNode] from [member ActionPlayer.action_map].
+func get_actions_dict() -> Dictionary[NodePath, ActionNode]:
+	var result: Dictionary[NodePath, ActionNode] = {}
+	for path: NodePath in action_map.values():
+		if _action_container.has(path):
+			result[path] = _action_container[path]
+	return result
+
 ## Return an [Array] of [ActionNode]s that are currently playing.
 func get_playing_actions() -> Array[ActionNode]:
 	return _playing_actions.duplicate()
