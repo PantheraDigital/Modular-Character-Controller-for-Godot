@@ -1,4 +1,4 @@
-# Modular-Character-Controller-for-Godot
+# Modular-Character-Controller-for-Godot v3.0.1
 **Compatible Godot Versions:** 4.4, 4.5, 4.6.1 \
 **Contact:** pantheradigitalonline@gmail.com \
 **Links:**
@@ -161,7 +161,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## Debug
 ### UI
-A [UI debugger](addons/modular_character_controller/debug/scenes/action_tree_debug_ui.tscn) is provided. It works with and without ActionMapRemapper. Just add the scene as a child to ActionPlayer. The UI will display all requests, the ActionNodes mapped to those requests, if the action is playing, and the names of the maps ActionMapRemapper adds.
+A [UI debugger](addons/modular_character_controller/debug/scenes/action_tree_debug_ui.tscn) is provided. It works with and without ActionMapRemapper. The UI will display all requests, the ActionNodes mapped to those requests, if the action is playing, and the names of the maps ActionMapRemapper adds.
 
 ### Logger
 ActionPlayer, ActionMapRemapper, and ActionPlayerDebugUI make use of the [CustomLogger](addons/modular_character_controller/debug/scripts/logger.gd) class to print out useful debug info if their debug variable is enabled.
