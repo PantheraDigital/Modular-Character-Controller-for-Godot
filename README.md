@@ -10,10 +10,9 @@
 [Getting Started](#getting-started) \
 | [What Is Included](#what-is-included) \
 | [Set Up](#set-up) \
-| | [Addon](#addon) \
-| | [Examples](#examples) \
 [Using the Modular Character Controller](#using-the-modular-character-controller) \
 | [General Overview](#general-overview) \
+| [Examples](#examples) \
 | [Parts](#parts) \
 | | [Action Node](#action-node) \
 | | [Action Player](#action-player) \
@@ -27,10 +26,9 @@
 # Getting Started
 ## What Is Included
 - [core scripts](addons/modular_character_controller/scripts)
-  - [debug scripts](addons/modular_character_controller/debug)
+- [debug scripts](addons/modular_character_controller/debug)
 - [template scripts](addons/script_templates)
 ## Set Up
-### Addon
 1. Download the [addons](addons) folder
 2. Place folder in your Godot project
    - If you have an "addons" folder in your project already then bring the [modular_character_controller](addons/modular_character_controller) folder into that folder
@@ -38,22 +36,66 @@
 3. Move the [script_templates](addons/script_templates) to your project at the top level directory "res://"
    - If you have a "script_templates" folder, place the contents of this folder into yours.
    - [Godot project-defined-templates tutorial](https://docs.godotengine.org/en/stable/tutorials/scripting/creating_script_templates.html#project-defined-templates)
-### Examples
-You can find examples I have made using this system [here](https://github.com/PantheraDigital/Modular-Character-Controller-for-Godot-Examples).
-
-Each example project contains the version of this project it was made with so some exapmles may not be up to date but will function without additional work.
 
 # Using the Modular Character Controller 
 ## General Overview 
-The heart of Modular Character Controller is two parts, the ActionNode and the ActionPlayer. ActionNodes implement what a character can do and the ActionPlayer is used to tell the character what to do.
+The Modular Character Controller is built with the Model View Controller, State, and Component patterns.
 
-This system is designed to make it clear what a character is capable of at any time, while also keeping the character highly modular, making characters faster to develop and easier to adjust at runtime. The character state is no longer a rigid class but a collection of actions that can be changed at any moment.
+- States are no longer concrete classes, they are now composites of components (action nodes).
+  - Easy to change behavior at any time, just add or remove a component from a state.
+  - Encourages code re-usability since components can be used across many states.
 
-Input is also separated from the character, following the Model View Controller pattern, by using a request system that allows other objects to request a character perform an action. If they can, and they have that action, then it is done. This allows for much more freedom over what can control a character and makes it easier to tie player inputs to actions.
+- States are also now action maps (dictionaries), mapping requests (keys/strings) to actions (values/action nodes).
+  - Action Player (holder of states) becomes the single point of contact between characters and controllers.
+  - Actions can be mapped to any request.
+  - Controllers don't need to know the state of a character to make a request.
+
+- Controllers separate input from characters, providing much more freedom and flexibility.
+  - Any object can control a character.
+  - Any number of controllers can control a single character.
+  - A single controller can control any number of characters.
+
+States now look like this: 
+```
+{ 
+  &"grounded":{&"move":^"Move", &"jump":^"Jump", &"attack":^"Attack"}, 
+  &"attacking":{&"attack":^"Attack"} 
+}
+```
+
+And input handling looks like this:
+```
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed(&"jump"):
+		action_player.play(self, &"jump")
+```
+or this:
+```
+if in_range(target):
+    action_player.play(self, &"attack")
+```
+or this:
+```
+func _process(_delta: float) -> void:
+	var input_direction: Vector2 = Vector2(
+		Input.get_axis(&"move_left", &"move_right"),
+		Input.get_axis(&"move_up", &"move_down")
+	)
+	action_player.play(self, &"move", {&"direction":input_direction})
+```
+
+The complexity of the system comes into play when implementing the actions. Since actions work together to form a state, thought must be put into how actions work together, if they do. A state may have no actions interact with each other, or it may have actions that block or interrupt other actions. 
+
+When building a character, consider what they can do and what they can be told to do. A character may be able to walk up walls, but can only be told to move forward, backward, left, or right. In this case walking would be the action and how they walk (on ground or wall) is determined by their physics (or other subsystem).
+
+## Examples
+You can find examples I have made using this system [here](https://github.com/PantheraDigital/Modular-Character-Controller-for-Godot-Examples). They demonstrate the different ways this system can be used, and how to use it.
+
+Each example project contains the version of this project it was made with so some examples may not be up to date but will function without additional work.
 
 ## Parts
 ### Action Node
-[ActionNodes](addons/modular_character_controller/scripts/action_node.gd) hold the game logic needed for a character to perform a specific task (action) related to the Nodes in the character. Examples would be moving, looking, attacking, climbing, and even taking damage. 
+[ActionNodes](addons/modular_character_controller/scripts/action_node.gd) hold the game logic needed for a character to perform a specific action, examples would be: moving, looking, attacking, climbing, and even taking damage. The implementation of an ActionNode will vary, similarly to how a function would between different classes. Consider what characters the ActionNode is expected to be attached to and the subsystems on the character already. An ActionNode may perform all the logic needed for an action or coordinate other systems to perform an action, like physics and animation systems to animate and move a character.
 
 The collection of ActionNodes on a character should represent the different things they may do during game play. However, ActionNodes are designed to be removed and added during gameplay to allow characters to be more dynamic, so all ActionNodes do not need to be attached to the character from the start.
 
@@ -88,10 +130,8 @@ To move call: \
 and to stop: \
 `move_action.stop()`
 
-When thinking in terms of a state machine, imagine ActionNodes as the parts of a single state, coming together to make that state. By doing this you can identify shared logic between states that can be a single ActionNode.
-
 ### Action Player
-The [ActionPlayer](addons/modular_character_controller/scripts/action_player.gd) provides a way for objects outside of the character to Play and Stop actions attached to it. It also allows for control over which actions are accessible to those external objects. The way this works is similar to an API by mapping requests to ActionNodes.
+The [ActionPlayer](addons/modular_character_controller/scripts/action_player.gd) provides an organized way for objects outside of the character to Play and Stop actions attached to it, without having to find the nodes, by acting as the single point of contact between them. It also allows for control over which actions are accessible to those external objects. The way this works is similar to an API by mapping requests to ActionNodes. The map acts as a public interface for other objects to request actions. 
 
 This looks like \
 `{&"move":^"Move", &"jump":^"Jump"}`, where `&"move"` and `&"jump"` are the requests and `^"Move"` and `^"Jump"` are the ActionNodes attached to the ActionPlayer.
@@ -111,10 +151,14 @@ To change the actions available, or to change which action is called on by a req
 Example of ActionPlayer with ActionNodes as children and its action map set in the inspector: \
 ![](imgs/ActionPlayer.png) ![](imgs/ActionPlayerInspector.png)
 
-Note that not all ActionNodes need to be added to a map. The map acts as a public interface for other objects to request actions. In the above, actions TakeDamage and Die are called directly from the damage system on the character but will never be called from an object external to the character.
+In the above, actions TakeDamage and Die are called directly from the damage system, a subsystem, in the character but will never be called from an object external to the character.
+
+Note that not all ActionNodes need to be added to a map and may be used by the character directly.
+
+Also note that this is where ActionNodes are composed together to form a "state", within the action map. This means the action map can be viewed as the state of a character.
 
 ### Action Map Remapper
-The [ActionMapRemapper](addons/modular_character_controller/scripts/action_map_remapper.gd) is simply a tool to manage multiple mappings a character may have. While the ActionPlayer only holds one map, this holds multiple, allowing for easier swapping during gameplay.
+The [ActionMapRemapper](addons/modular_character_controller/scripts/action_map_remapper.gd) is simply a container to hold multiple mappings a character may have. While the ActionPlayer only holds one map, this holds multiple, allowing for easier swapping during gameplay.
 
 The remapper holds maps:
 ```
