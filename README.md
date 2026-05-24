@@ -39,54 +39,89 @@
 
 # Using the Modular Character Controller 
 ## General Overview 
-The Modular Character Controller is built with the Model View Controller, State, and Component patterns.
+The Modular Character Controller is built with the Model View Controller and Component patterns in mind. The model is the character, the controller is the controller, and the view is handled by Godot with cameras. The controller is an object that modifies the character through an API like relationship, sending requests for the character to carry out. The character is composed of components that are mapped to requests, in which their responsibility is to implement the request.
 
-- States are no longer concrete classes, they are now composites of components (action nodes).
-  - Easy to change behavior at any time, just add or remove a component from a state.
-  - Encourages code re-usability since components can be used across many states.
+Put simply, controllers ask characters to do something. Characters will do that thing if they have a component that tells them how to do the thing.
 
-- States are also now action maps (dictionaries), mapping requests (keys/strings) to actions (values/action nodes).
-  - Action Player (holder of states) becomes the single point of contact between characters and controllers.
-  - Actions can be mapped to any request.
-  - Controllers don't need to know the state of a character to make a request.
+Here is a super simplified version of the action system, the core of the Modular Character Controller, stripped to its base features. _(These nodes would be in the character scene.)_
+```
+## Action Player
+extends Node
 
-- Controllers separate input from characters, providing much more freedom and flexibility.
-  - Any object can control a character.
-  - Any number of controllers can control a single character.
-  - A single controller can control any number of characters.
+# hold usable actions 
 
-States now look like this: 
-```
-{ 
-  &"grounded":{&"move":^"Move", &"jump":^"Jump", &"attack":^"Attack"}, 
-  &"attacking":{&"attack":^"Attack"} 
-}
+var action_map: Dictionary[StringName, ActionNode] = {"jump": jump_action, "move": drive_action}
+
+func play(action: StringName, data: Dictionary = {}) -> void:
+    if action_map.has(action) and action_map[action].can_play():
+        action_map[action].play(data)
+
+
+## Action Node
+extends Node
+
+func can_play() -> bool:
+    return true
+
+func play(data: Dictionary) -> void:
+    pass
+
+
+## Jump Action
+extends ActionNode
+
+# apply an upward force only when the character is on the ground
+
+@export var character_body: CharacterBody3D
+var jump_power: float = 100
+
+func can_play() -> bool:
+    return character_body.is_on_floor()
+
+func play(_data: Dictionary) -> void:
+    character_body.velocity += Vector2(0.0, jump_power)
+
+
+## Drive Action
+extends ActionNode
+
+# add force in a given direction
+
+@export var character_body: CharacterBody3D
+var drive_speed: float = 200
+
+func can_play() -> bool:
+    return character_body.is_on_floor()
+
+func play(data: Dictionary) -> void:
+    if data.has("direction"):
+        character_body.velocity += data["direction") * drive_speed
 ```
 
-And input handling looks like this:
+Now, without input to play any actions, the character will do nothing. This is where the controller comes in. _(This node does not need to be in the character scene.)_
 ```
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(&"jump"):
-		action_player.play(self, &"jump")
-```
-or this:
-```
-if in_range(target):
-    action_player.play(self, &"attack")
-```
-or this:
-```
+## Controller
+extends Node
+
+# turn player input into requests for a character
+
+@export var action_player: ActionPlayer
+
 func _process(_delta: float) -> void:
 	var input_direction: Vector2 = Vector2(
 		Input.get_axis(&"move_left", &"move_right"),
 		Input.get_axis(&"move_up", &"move_down")
 	)
-	action_player.play(self, &"move", {&"direction":input_direction})
+	action_player.play(&"move", {&"direction":input_direction})
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed(&"jump"):
+		action_player.play(&"jump")
 ```
 
-The complexity of the system comes into play when implementing the actions. Since actions work together to form a state, thought must be put into how actions work together, if they do. A state may have no actions interact with each other, or it may have actions that block or interrupt other actions. 
+When building a character, consider what they can do and what they can be told to do. A character may be able to walk up walls, but can only be told to move forward, backward, left, or right. In this case walking would be the action and how they walk (on ground or wall) is determined by their physics (or other subsystem). In this example specifically there would be an action node that simply applies a force in the direction to move, but another script will process the physics and apply corrections when colliding with a wall. The physics processing would be an underlying system in the character that defines the how, while the action node and the request it is mapped to defines the what.
 
-When building a character, consider what they can do and what they can be told to do. A character may be able to walk up walls, but can only be told to move forward, backward, left, or right. In this case walking would be the action and how they walk (on ground or wall) is determined by their physics (or other subsystem).
+Also consider the `action_map` requests (keys) as the interface other objects use to control the character. Requests can be generic terms while the actions mapped to them provide specific details. A character may drive or walk, but they do so when told to move. This allows controllers to control a variety of characters without needing to change. This can also be viewed as similar to Godot's "input Map" which maps a group of inputs to a general action name. 
 
 ## Examples
 You can find examples I have made using this system [here](https://github.com/PantheraDigital/Modular-Character-Controller-for-Godot-Examples). They demonstrate the different ways this system can be used, and how to use it.
